@@ -1,4 +1,3 @@
-# videosummary
 
 # Video Summary Project
 
