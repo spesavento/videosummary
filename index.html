@@ -16,40 +16,44 @@
 <style type="text/css">
 body { font-family: 'Open Sans', sans-serif; background-color: #282828;}
 a { color: #09F; text-decoration: none; }
-.demorow {background-color: #FFFFFF; display: inline; height: 320px; float:left; clear:left; margin: 20px; border: 1px solid #E1E1E1; }
+.demorow {background-color: #FFFFFF;   float:left; clear:left; margin: 10px 20px 10px 20px; border: 1px solid #E1E1E1; }
 .fullvideo {width:420px; float: left; padding:10px;}
 .generalcategory {font-size:large;}
 .methodchoice {color:blue;}
-.picksummary {width:150px;float: left; margin-left:5px; height:100%; padding:10px;}
-.projectinfo {width:400px; float:left; clear:left;}
-.projecttitle {float:left; font-size:x-large; margin-top:50px; margin-top: 30px; margin-left:20px; color:#FFFFFF; }
+.picksummary { clear:left; float: left;  background-color: white; padding: 0 0 20px 20px;}
+.pickmethod { background-color: #4CAF50; border: none; color: white; padding: 8px 16px; text-align: center; text-decoration: none;
+            display: inline-block; font-size: medium; margin: 4px 2px; transition-duration: 0.4s; cursor: pointer; border-radius: 5px; }
+.projectinfo {width:400px; float:left; }
+.projecttitle {float:left; font-size:x-large; margin-top: 30px; margin-left:20px; color:#FFFFFF; }
 .projectsubtitle {color:#FFFFFF; font-size:medium; clear:left; float:left; margin-left: 20px;}
 .usermessage {color:white; font-size: medium; margin: 15px 20px 0 20px; float:left;  }
-.summaryvideo {width:420px;float: left; padding:10px;}
-.stats {width:150px;float: left; margin-left:5px;height:100%; padding:10px;}
-.statsdata {font-size: smaller;}
+.summaryvideo {width:420px; float: left; padding:10px;}
+.topheader {float:left; clear:left; margin-bottom:20px;}
 .userupload {float: left; width: 600px; margin-top: 35px;}
 .userbutton {display: inline-block; border-radius: 8px; background-color: #f4511e; border: none; color: #FFFFFF; text-align: center; font-size: medium;
-padding: 10px; width: 170px; transition: all 0.5s; cursor: pointer; margin: 5px;}
+              padding: 10px; width: 170px; transition: all 0.5s; cursor: pointer; margin: 5px;}
 .userbutton span {cursor: pointer; display: inline-block; position: relative; transition: 0.5s; }
 .userbutton span:after { content: '\00bb'; position: absolute; opacity: 0; top: 0; right: -20px; transition: 0.5s;}
 .userbutton:hover span { padding-right: 25px;}
 .userbutton:hover span:after { opacity: 1; right: 0; }
-.videocategory {background-color: #E1E1E1; padding:3px;}
+.videocategory {background-color: #87CEFA; padding:6px 0 6px 10px; font-weight: bold;}
 video { width: 100%    !important; height: auto   !important;}
+
 </style>
 
 </head>
 
 <body>
 
-<div class="projectinfo">
-    <div class="projecttitle">Video Summary Project</div>
-    <div class="projectsubtitle">Class TBD, Sara P, Etc</div>
-</div>
-<div class="userupload">
-    <button class="userbutton" style="vertical-align:middle"><span>upload video </span></button>
-    <p class="usermessage">Try it - upload a video to summarize!</p>
+<div class="topheader">
+    <div class="projectinfo">
+        <div class="projecttitle">Video Summary Project</div>
+        <div class="projectsubtitle">Class TBD, Sara P, Etc</div>
+    </div>
+    <div class="userupload">
+        <button class="userbutton" style="vertical-align:middle"><span>upload video </span></button>
+        <p class="usermessage">Try it - upload a video to summarize!</p>
+    </div>
 </div>
 
 <div class="uservideoresult">
@@ -71,21 +75,12 @@ video { width: 100%    !important; height: auto   !important;}
         </video>
     </div>
     <div class="picksummary">
-        summary method: <br>
-        <p class="methodchoice">
-        bicycle, statue<br>
-        people<br>
-        scene<br>
-        </p>
-    </div>
-    <div class="stats">
-        video stats <br>
-        <p class="statsdata">
-        full frames: foo<br>
-        summary frames: bar<br>
-        full time: yada<br>
-        summary time: yada<br>
-        </p>
+        chose summary view: <span class="methodchoice">
+            <button class="pickmethod">bicycle</button>
+            <button class="pickmethod">statue</button>
+            <button class="pickmethod">people</button>
+            <button class="pickmethod">scene</button>
+        </span>
     </div>
 </div>
 
@@ -104,15 +99,11 @@ video { width: 100%    !important; height: auto   !important;}
         </video>
     </div>
     <div class="picksummary">
-        summary method: <br>
-        <p class="methodchoice">
-        people<br>
-        sound<br>
-        animal<br>
-        </p>
-    </div>
-    <div class="stats">
-         stats here
+        chose summary view: <span class="methodchoice">
+            <button class="pickmethod">people</button>
+            <button class="pickmethod">sounds</button>
+            <button class="pickmethod">animals</button>
+        </span>
     </div>
 </div>
 
@@ -131,14 +122,9 @@ video { width: 100%    !important; height: auto   !important;}
         </video>
     </div>
     <div class="picksummary">
-        summary method: <br>
-        <p class="methodchoice">
-        sound goal detection<br>
-        scene time<br>
-        </p>
-    </div>
-    <div class="stats">
-         stats here
+        chose summary view: <span class="methodchoice">
+            <button class="pickmethod">sound detection highlights</button>
+        </span>
     </div>
 </div>
 
