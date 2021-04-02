@@ -1,0 +1,149 @@
+<!doctype html>
+
+<head>
+<meta charset="utf-8">
+
+<title>video summarization project</title>
+
+<link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet"/>
+
+<!-- may use jQuery -->
+<link rel="stylesheet" href="jquery/jquery-ui.css">
+<link rel="stylesheet" href="jquery/jquery-ui.theme.css">
+<script src="jquery/jquery.js"></script>
+<script src="jquery/jquery-ui.js"></script>
+
+<style type="text/css">
+body { font-family: 'Open Sans', sans-serif; background-color: #282828;}
+a { color: #09F; text-decoration: none; }
+.demorow {background-color: #FFFFFF; display: inline; height: 320px; float:left; clear:left; margin: 20px; border: 1px solid #E1E1E1; }
+.fullvideo {width:420px; float: left; padding:10px;}
+.generalcategory {font-size:large;}
+.methodchoice {color:blue;}
+.picksummary {width:150px;float: left; margin-left:5px; height:100%; padding:10px;}
+.projectinfo {width:400px; float:left; clear:left;}
+.projecttitle {float:left; font-size:x-large; margin-top:50px; margin-top: 30px; margin-left:20px; color:#FFFFFF; }
+.projectsubtitle {color:#FFFFFF; font-size:medium; clear:left; float:left; margin-left: 20px;}
+.usermessage {color:white; font-size: medium; margin: 15px 20px 0 20px; float:left;  }
+.summaryvideo {width:420px;float: left; padding:10px;}
+.stats {width:150px;float: left; margin-left:5px;height:100%; padding:10px;}
+.statsdata {font-size: smaller;}
+.userupload {float: left; width: 600px; margin-top: 35px;}
+.userbutton {display: inline-block; border-radius: 8px; background-color: #f4511e; border: none; color: #FFFFFF; text-align: center; font-size: medium;
+padding: 10px; width: 170px; transition: all 0.5s; cursor: pointer; margin: 5px;}
+.userbutton span {cursor: pointer; display: inline-block; position: relative; transition: 0.5s; }
+.userbutton span:after { content: '\00bb'; position: absolute; opacity: 0; top: 0; right: -20px; transition: 0.5s;}
+.userbutton:hover span { padding-right: 25px;}
+.userbutton:hover span:after { opacity: 1; right: 0; }
+.videocategory {background-color: #E1E1E1; padding:3px;}
+video { width: 100%    !important; height: auto   !important;}
+</style>
+
+</head>
+
+<body>
+
+<div class="projectinfo">
+    <div class="projecttitle">Video Summary Project</div>
+    <div class="projectsubtitle">Class TBD, Sara P, Etc</div>
+</div>
+<div class="userupload">
+    <button class="userbutton" style="vertical-align:middle"><span>upload video </span></button>
+    <p class="usermessage">Try it - upload a video to summarize!</p>
+</div>
+
+<div class="uservideoresult">
+    <!-- user uploaded video and results will go here, on top -->
+</div>
+
+<div class="demorow">
+    <div class="videocategory">General Video Demo</div>
+    <div class="fullvideo">
+        full video<br>
+        <video id="video1f" controls preload=auto >
+            <source src="https://videosummaryfiles.s3-us-west-1.amazonaws.com/globe1/full/globe1.mp4" type='video/mp4'/>
+        </video>
+    </div>
+    <div class="summaryvideo">
+        summary video<br>
+        <video id="video1s" controls preload=auto >
+            <source src="https://videosummaryfiles.s3-us-west-1.amazonaws.com/globe1/full/globe1.mp4" type='video/mp4'/>
+        </video>
+    </div>
+    <div class="picksummary">
+        summary method: <br>
+        <p class="methodchoice">
+        bicycle, statue<br>
+        people<br>
+        scene<br>
+        </p>
+    </div>
+    <div class="stats">
+        video stats <br>
+        <p class="statsdata">
+        full frames: foo<br>
+        summary frames: bar<br>
+        full time: yada<br>
+        summary time: yada<br>
+        </p>
+    </div>
+</div>
+
+<div class="demorow">
+    <div class="videocategory">Surveillance Video Demo</div>
+    <div class="fullvideo">
+        full video<br>
+        <video id="video2f" controls preload=auto >
+            <source src="https://videosummaryfiles.s3-us-west-1.amazonaws.com/globe1/full/globe1.mp4" type='video/mp4'/>
+        </video>
+    </div>
+    <div class="summaryvideo">
+        summary video<br>
+        <video id="video2s" controls preload=auto >
+            <source src="https://videosummaryfiles.s3-us-west-1.amazonaws.com/globe1/full/globe1.mp4" type='video/mp4'/>
+        </video>
+    </div>
+    <div class="picksummary">
+        summary method: <br>
+        <p class="methodchoice">
+        people<br>
+        sound<br>
+        animal<br>
+        </p>
+    </div>
+    <div class="stats">
+         stats here
+    </div>
+</div>
+
+<div class="demorow">
+    <div class="videocategory">Sports Video Demo</div>
+    <div class="fullvideo">
+        full video<br>
+        <video id="video3f" controls preload=auto>
+            <source src="https://videosummaryfiles.s3-us-west-1.amazonaws.com/globe1/full/globe1.mp4" type='video/mp4'/>
+        </video>
+    </div>
+    <div class="summaryvideo">
+        summary video<br>
+        <video id="video3s" controls preload=auto>
+            <source src="https://videosummaryfiles.s3-us-west-1.amazonaws.com/globe1/full/globe1.mp4" type='video/mp4'/>
+        </video>
+    </div>
+    <div class="picksummary">
+        summary method: <br>
+        <p class="methodchoice">
+        sound goal detection<br>
+        scene time<br>
+        </p>
+    </div>
+    <div class="stats">
+         stats here
+    </div>
+</div>
+
+<!-- javascript files-->
+<script type="text/javascript" src="tbd.js"></script>
+
+</body>
+</html>
