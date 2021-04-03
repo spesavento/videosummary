@@ -29,7 +29,7 @@ a { color: #09F; text-decoration: none; }
 .usermessage {color:white; font-size: medium; margin: 15px 20px 0 20px; float:left;  }
 .summaryvideo {width:420px; float: left; padding:10px;}
 .topheader {float:left; clear:left; margin-bottom:20px;}
-.userupload {float: left; width: 600px; margin-top: 35px;}
+.userupload {float: left; width: 400px; margin-top: 35px;}
 .userbutton {display: inline-block; border-radius: 8px; background-color: #f4511e; border: none; color: #FFFFFF; text-align: center; font-size: medium;
               padding: 10px; width: 170px; transition: all 0.5s; cursor: pointer; margin: 5px;}
 .userbutton span {cursor: pointer; display: inline-block; position: relative; transition: 0.5s; }
@@ -61,11 +61,11 @@ video { width: 100%    !important; height: auto   !important;}
 </div>
 
 <div class="demorow">
-    <div class="videocategory">General Video Demo</div>
+    <div class="videocategory">General Video Demo - UC Davis scenes</div>
     <div class="fullvideo">
         full video<br>
         <video id="video1f" controls preload=auto >
-            <source src="https://videosummaryfiles.s3-us-west-1.amazonaws.com/globe1/full/globe1.mp4" type='video/mp4'/>
+            <source src="https://videosummaryfiles.s3-us-west-1.amazonaws.com/ucdavis/full/ucdavis.mp4" type='video/mp4'/>
         </video>
     </div>
     <div class="summaryvideo">
@@ -76,6 +76,7 @@ video { width: 100%    !important; height: auto   !important;}
     </div>
     <div class="picksummary">
         chose summary view: <span class="methodchoice">
+            <button class="pickmethod">time</button>
             <button class="pickmethod">bicycle</button>
             <button class="pickmethod">statue</button>
             <button class="pickmethod">people</button>
