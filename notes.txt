@@ -1,5 +1,35 @@
 
 
+Steps to set up AWS
+
+1. AWS Identity and Access Management (IAM) - get a Key ID and Access Key
+
+    https://aws.amazon.com/iam/
+    Console --> https://console.aws.amazon.com/iam/home?region=us-west-1#/home
+    Users --> https://console.aws.amazon.com/iam/home?region=us-west-1#/users
+    Place to get KEY and
+    for:  AmazonS3FullAccess, and AmazonRekognitionFullAccess
+
+2. Install AWS Command Line Interface (CLI)
+
+    https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-quickstart.html
+
+    Ref doc https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2-mac.html
+    $ curl "https://awscli.amazonaws.com/AWSCLIV2.pkg" -o "AWSCLIV2.pkg"
+    $ sudo installer -pkg AWSCLIV2.pkg -target /
+
+    Verify it was installed
+    $ which aws
+    /usr/local/bin/aws
+
+    $ aws --version
+    aws-cli/2.1.34 Python/3.8.8 Darwin/20.4.0 exe/x86_64 prompt/off
+
+    $ aws configure
+    AWS Access Key ID [None]: <your key>
+    AWS Secret Access Key [None]: <your access key>
+    Default region name [None]: us-west-1
+    Default output format [None]: json
 
 
 S3 Bucket:
@@ -25,4 +55,6 @@ ref article: https://havecamerawilltravel.com/photographer/how-allow-public-acce
         }
     ]
 }
+
+
 

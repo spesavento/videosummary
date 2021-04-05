@@ -1,0 +1,5 @@
+
+
+[ ] get aws rekognition working to output json file
+[ ] establish an RDS MySQL database
+[ ] find amazon usage monitoring console
