@@ -40,7 +40,9 @@ print ('video: ',num_frames,'frames,',fps,'fps,',int(video_time),'seconds,', pix
 cvvideo.release()
 cv2.destroyAllWindows()
 
-# parse video into individual frames 1.jpg, 2.jpg, etc,
+# create a local folder localfiles/<videoname>/frames/ just outside the git repo folder
+# this local folder will be used to get the parsed images on your
+# local machine. This parses video into individual frames 1.jpg, 2.jpg, etc,
 # cap is the video opened in opencv
 cap = cv2.VideoCapture(thevideo)
 i = 0
@@ -49,8 +51,8 @@ while(cap.isOpened()):
     if ret==True:
         # temporarily store the frame in a local folder ../temp
         # there is probably a way to directly upload it to S3 ?
-        cv2.imwrite('../temp_frames/'+str(i)+'.jpg',frame)
-        print('stored locally ../temp_frames/'+str(i))
+        cv2.imwrite('../localfiles/'+videotoparse+'/frames/'+str(i)+'.jpg',frame)
+        print('stored locally '+stri(i))
         i = i + 1
     else:
         print('can not open video')
@@ -58,7 +60,7 @@ while(cap.isOpened()):
 # end the opencv session
 cap.release()
 cv2.destroyAllWindows()
-print (i+1, ' image frames extracted in temp_frames/')
+print (i+1, ' image frames extracted in localfiles')
 
 # NEVER upload the key and sec_key to GitHub
 key="<hide>"
@@ -66,22 +68,24 @@ sec_key= "<hide>"
 region_name = "us-west-1"
 
 # create an s3 sessioin using boto3, allows access to S3
-s3_client = boto3.client('s3', aws_access_key_id=key, aws_secret_access_key=sec_key, region_name=region_name)
+
+# s3_client = boto3.client('s3', aws_access_key_id=key, aws_secret_access_key=sec_key, region_name=region_name)
 
 # upload the frames to S3
-cap = cv2.VideoCapture(thevideo)
-x=1
-while x < num_frames:
-    # upload the image frame to S3
-    s3_client.upload_file('../temp_frames/'+str(x)+'.jpg', 'videosummaryfiles', videotoparse+'/frames/'+str(x)+'.jpg')
-    print ('uploaded to S3 '+str(x))
-    # delete the image frame from local folder
-    os.remove('../temp_frames/'+str(x)+'.jpg')
-    print ('deleted file locally '+str(x))
-    x = x+1
-# end of openCV session
-cap.release()
-cv2.destroyAllWindows()
-print ('completed frame uploads to S3')
+
+# cap = cv2.VideoCapture(thevideo)
+# x=1
+# while x < num_frames:
+#     # upload the image frame to S3
+#     s3_client.upload_file('../temp_frames/'+str(x)+'.jpg', 'videosummaryfiles', videotoparse+'/frames/'+str(x)+'.jpg')
+#     print ('uploaded to S3 '+str(x))
+#     # delete the image frame from local folder
+#     os.remove('../temp_frames/'+str(x)+'.jpg')
+#     print ('deleted file locally '+str(x))
+#     x = x+1
+# # end of openCV session
+# cap.release()
+# cv2.destroyAllWindows()
+# print ('completed frame uploads to S3')
 
 

@@ -1,8 +1,7 @@
 
 
-Steps to set up AWS
 
-1. AWS Identity and Access Management (IAM) - get a Key ID and Access Key
+AWS Identity and Access Management (IAM) - get a Key ID and Access Key
 
     https://aws.amazon.com/iam/
     Console --> https://console.aws.amazon.com/iam/home?region=us-west-1#/home
@@ -10,7 +9,7 @@ Steps to set up AWS
     Place to get KEY and
     for:  AmazonS3FullAccess, and AmazonRekognitionFullAccess
 
-2. Install AWS Command Line Interface (CLI)
+Install AWS Command Line Interface (CLI)
 
     https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-quickstart.html
 
@@ -33,28 +32,31 @@ Steps to set up AWS
 
 
 S3 Bucket:
-Our S3 bucket name is "videosummaryfiles"
-S3 filename is like "ucdavis/frames/2.jpg" <-- note the filename is folder like
+    Our S3 bucket name is "videosummaryfiles"
+    S3 filename is like "ucdavis/frames/2.jpg" <-- note the filename is folder like
 
 S3 Permissions:
-Files in S3 bucket are made public read using
-this script in the Permissions setting. This allows
-images and videos to be displayed on a public website.
-ref article: https://havecamerawilltravel.com/photographer/how-allow-public-access-amazon-bucket/
-{
-    "Version": "2008-10-17",
-    "Statement": [
-        {
-            "Sid": "AllowPublicRead",
-            "Effect": "Allow",
-            "Principal": {
-                "AWS": "*"
-            },
-            "Action": "s3:GetObject",
-            "Resource": "arn:aws:s3:::videosummaryfiles/*"
-        }
-    ]
-}
+    Files in S3 bucket are made public read using
+    this script in the Permissions setting. This allows
+    images and videos to be displayed on a public website.
+    ref article: https://havecamerawilltravel.com/photographer/how-allow-public-access-amazon-bucket/
+    {
+        "Version": "2008-10-17",
+        "Statement": [
+            {
+                "Sid": "AllowPublicRead",
+                "Effect": "Allow",
+                "Principal": {
+                    "AWS": "*"
+                },
+                "Action": "s3:GetObject",
+                "Resource": "arn:aws:s3:::videosummaryfiles/*"
+            }
+        ]
+    }
 
+Rekognition:
+
+    display bounding boxes https://docs.aws.amazon.com/rekognition/latest/dg/images-displaying-bounding-boxes.html
 
 
