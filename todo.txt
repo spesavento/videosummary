@@ -1,4 +1,0 @@
-
-[ ] design MySQL tables
-[ ] create RDS MySQL database
-[ ] run parseframes.py using CLI without key needed
