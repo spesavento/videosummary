@@ -1,5 +1,6 @@
+#!/usr/bin/env python3
 
-# This uses Amazon Rekognition to get object labels on frame images
+# Use Amazon Rekognition to get object labels on frame images
 # Finds people, text and objects
 # Uploads object recognition and bounding boxes to AWS RDS in boundingbox MySQL table
 
