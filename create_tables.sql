@@ -34,4 +34,6 @@ SELECT * FROM boundingbox;
 ALTER TABLE boundingbox MODIFY COLUMN confidence FLOAT;
 DELETE from boundingbox WHERE boundingbox_id BETWEEN 42 AND 59;
 SELECT * FROM boundingbox WHERE object_detected = 'Bicycle' and video_id = 1 ORDER BY frame_number ASC;
+INSERT INTO videometadata.video (videoname, numframes, widthpixels, heightpixels, fps) VALUES ('driveway', 5133, 1280, 720, 29)
+SELECT * FROM boundingbox WHERE video_id = 3;
 

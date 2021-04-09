@@ -38,8 +38,9 @@ def convert_frames_to_video(pathIn,pathOut,fps):
     # for OSX, mp4 seems to be the best choice for playing videos
     # to go -- automatically read the size, width and height, I had to hardcode 960,540
     # because img.shape did not work
+    # Note width, height must be the same as the images
     fourcc = cv2.VideoWriter_fourcc(*'MP4V')
-    out = cv2.VideoWriter(pathOut, fourcc, fps, (960,540))
+    out = cv2.VideoWriter(pathOut, fourcc, fps, (1280,720))
     # out = cv2.VideoWriter(pathOut,cv2.VideoWriter_fourcc(*'DIVX'), fps, size)
 
     for i in range(len(frame_array)):
@@ -48,12 +49,12 @@ def convert_frames_to_video(pathIn,pathOut,fps):
     out.release()
 
 def main():
-    # pathIn is the folder were the images to compile to video are located, the must be alphabetically sorted already
-    pathIn= '/Users/gerrypesavento/Documents/sara/videosummary/localfiles/ucdavis/summary/bicycle/frames_ordered/'
+    # pathIn is the folder were the images to compile to video are located, the must be alphabetically sorted already (ex. 000245.jpg)
+    pathIn= '<local path here>/localfiles/driveway/summary/person/frames/'
     # pathOut is where the compiled summary movie is to be located
-    pathOut = '/Users/gerrypesavento/Documents/sara/videosummary/localfiles/ucdavis/summary/bicycle/bicycle6.mp4'
+    pathOut = '<local path here>/localfiles/driveway/summary/person/driveway_summary.mp4'
     # the frame rate should be close to that of the original video
-    fps = 25.0
+    fps = 29.0
     # call the function to convert to video
     convert_frames_to_video(pathIn, pathOut, fps)
 

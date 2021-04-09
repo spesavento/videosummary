@@ -30,20 +30,24 @@ conn = pymysql.connect(
     database="videometadata",
     host="videometadata.cqcc6zskeglo.us-west-1.rds.amazonaws.com",
     user="admin",
-    password="Twister123!",
+    password="<password here>",
     port=3306,
     )
 cur = conn.cursor()
 
-# use the ucdavis video for now
-video_id=1
+# use the driveway video
+video_id=3
 
-for i in range (1, 3857):
+for i in range (1, 5132):
 
-    theimage = 'ucdavis/frames/'+str(i)+'.jpg'
+    # for object label to work, image should be in S3 folder
+    theimage = 'driveway/frames/'+str(i)+'.jpg'
+
+    print ('analyzing image '+str(i)+'.jpg')
 
     # print out the object labels and locations
     for label in detect_labels('videosummaryfiles', theimage):
+        # print(label)
         name = label['Name']
         confidence = label['Confidence']
         for instance in label['Instances']:
@@ -51,6 +55,8 @@ for i in range (1, 3857):
             height = instance['BoundingBox']['Height']
             left = instance['BoundingBox']['Left']
             top = instance['BoundingBox']['Top']
+
+        if (name == 'Person'):
 
             sql = "INSERT INTO boundingbox (video_id,frame_number,object_detected,confidence,bb_width,bb_height,bb_left,bb_top) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)"
             val = (video_id, i, name, confidence, width, height, left, top)

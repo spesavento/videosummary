@@ -14,11 +14,11 @@ from pathlib import Path
 
 # for now, manually input the object and video variables here
 # Specify object to find, and video to use
-objecttofind = 'Bicycle'
-# 1 is ucdavis.mp4, this is the video_id in the mysql table
-videotouse = 1
-imageWidth=960
-imageHeight=540
+objecttofind = 'Person'
+# 3 is driveway.mp4, this is the video_id in the mysql table
+videotouse = 3
+imageWidth=1280
+imageHeight=720
 
 # establish a connection to AWS RDS MySQL database
 # need to import the database password (on Google Doc)
@@ -54,22 +54,23 @@ for row in result:
     lowerright_y = int(upperleft_y + (bb_height * imageHeight))
 
     # using local file
-    inImage='<your full local path here>/localfiles/ucdavis/frames/'+str(frame_number)+'.jpg'
-    outImage='<your full local path here>/localfiles/ucdavis/summary/bicycle/frames/'+str(frame_number)+'.jpg'
+    inImage='/Users/gerrypesavento/Documents/sara/videosummary/localfiles/driveway/frames/'+str(frame_number)+'.jpg'
+    outImage='/Users/gerrypesavento/Documents/sara/videosummary/localfiles/driveway/summary/person/frames/'+str(frame_number)+'.jpg'
 
     # if a summary image already has a bounding box, add a new one to the existing frame image
     my_file = Path(outImage)
     if my_file.is_file():
-        inImage='<your full local path here>/localfiles/ucdavis/summary/bicycle/frames/'+str(frame_number)+'.jpg'
+        inImage='/Users/gerrypesavento/Documents/sara/videosummary/localfiles/driveway/summary/person/frames/'+str(frame_number)+'.jpg'
         print ('found existing'+str(frame_number))
 
     imgcv = cv2.imread(inImage) # opencv numby array format
 
-    color = (0,255,0) # green box
+    color = (0,0,255) # blue box
+    line_width = 2
 
     # write a bounding box over the image
     # cv2.rectangle(image, start_point, end_point, color, thickness)
-    k=cv2.rectangle(imgcv, (upperleft_x, upperleft_y), (lowerright_x, lowerright_y),(0, 255, 0), 2)
+    k=cv2.rectangle(imgcv, (upperleft_x, upperleft_y), (lowerright_x, lowerright_y), color, line_width)
     cv2.imwrite(outImage, k)
     print ("wrote image "+ str(frame_number))
 
