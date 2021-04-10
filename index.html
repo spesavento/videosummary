@@ -64,21 +64,21 @@ video { width: 100%    !important; height: auto   !important;}
 </div>
 
 <div class="demorow">
-    <div class="videocategory">General Video Demo - UC Davis scenes</div>
+    <div class="videocategory">General Video Demo - UC Davis only show bicycles</div>
     <div class="fullvideo">
-        full video<br>
+        original full video<br>
         <video id="video1f" controls preload=auto >
             <source src="https://videosummaryfiles.s3-us-west-1.amazonaws.com/ucdavis/full/ucdavis.mp4" type='video/mp4'/>
         </video>
     </div>
     <div class="summaryvideo">
-        summary video<br>
+        summary vide bicycles<br>
         <video id="video1s" controls preload=auto >
             <source src="https://videosummaryfiles.s3-us-west-1.amazonaws.com/ucdavis/summary/bicycle6.mp4" type='video/mp4'/>
         </video>
     </div>
     <div class="picksummary">
-        chose summary view: <span class="methodchoice">
+        summary view: <span class="methodchoice">
             <!-- <button class="pickmethod">time</button> -->
             <button class="pickmethod">bicycle</button>
             <!-- <button class="pickmethod">benches</button>
@@ -88,22 +88,45 @@ video { width: 100%    !important; height: auto   !important;}
 </div>
 
 <div class="demorow">
-    <div class="videocategory">Surveillance Video Demo</div>
+    <div class="videocategory">Surveillance Video Demo - Only show people</div>
     <div class="fullvideo">
-        full video<br>
+        original full video<br>
         <video id="video2f" controls preload=auto >
             <source src="https://videosummaryfiles.s3-us-west-1.amazonaws.com/driveway/full/driveway.mp4" type='video/mp4'/>
         </video>
     </div>
     <div class="summaryvideo">
-        summary video<br>
+        summary video people<br>
         <video id="video2s" controls preload=auto >
             <source src="https://videosummaryfiles.s3-us-west-1.amazonaws.com/driveway/summary/driveway_summary.mp4" type='video/mp4'/>
         </video>
     </div>
     <div class="picksummary">
-        chose summary view: <span class="methodchoice">
+        summary view: <span class="methodchoice">
             <button class="pickmethod">people</button>
+            <!-- <button class="pickmethod">sounds</button>
+            <button class="pickmethod">animals</button> -->
+        </span>
+    </div>
+</div>
+
+<div class="demorow">
+    <div class="videocategory">General Video - Summarize using "Structured Similarity", 60% reduction</div>
+    <div class="fullvideo">
+        original full video, 3857 frames <br>
+        <video id="video3f" controls preload=auto >
+            <source src="https://videosummaryfiles.s3-us-west-1.amazonaws.com/ucdavis/full/ucdavis.mp4" type='video/mp4'/>
+        </video>
+    </div>
+    <div class="summaryvideo">
+        summary video ssim compression, 1513 frames<br>
+        <video id="video3s" controls preload=auto >
+            <source src="https://videosummaryfiles.s3-us-west-1.amazonaws.com/ucdavis/summary/ssim_summary.mp4" type='video/mp4'/>
+        </video>
+    </div>
+    <div class="picksummary">
+        summary view: <span class="methodchoice">
+            <button class="pickmethod">structured similarity</button>
             <!-- <button class="pickmethod">sounds</button>
             <button class="pickmethod">animals</button> -->
         </span>
@@ -114,18 +137,18 @@ video { width: 100%    !important; height: auto   !important;}
     <div class="videocategory">Sports Video Demo</div>
     <div class="fullvideo">
         full video<br>
-        <video id="video3f" controls preload=auto>
+        <video id="video4f" controls preload=auto>
             <source src="https://videosummaryfiles.s3-us-west-1.amazonaws.com/globe1/full/globe1.mp4" type='video/mp4'/>
         </video>
     </div>
     <div class="summaryvideo">
         summary video<br>
-        <video id="video3s" controls preload=auto>
+        <video id="video4s" controls preload=auto>
             <source src="https://videosummaryfiles.s3-us-west-1.amazonaws.com/globe1/full/globe1.mp4" type='video/mp4'/>
         </video>
     </div>
     <div class="picksummary">
-        chose summary view: <span class="methodchoice">
+        summary view: <span class="methodchoice">
             <button class="pickmethod">sound detection highlights</button>
         </span>
     </div>

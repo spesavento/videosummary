@@ -57,7 +57,7 @@ for row in result:
     inImage='/Users/gerrypesavento/Documents/sara/videosummary/localfiles/driveway/frames/'+str(frame_number)+'.jpg'
     outImage='/Users/gerrypesavento/Documents/sara/videosummary/localfiles/driveway/summary/person/frames/'+str(frame_number)+'.jpg'
 
-    # if a summary image already has a bounding box, add a new one to the existing frame image
+    # if a summary image already has a bounding box, that becomes the input image to add a 2nd (etc) bounding box
     my_file = Path(outImage)
     if my_file.is_file():
         inImage='/Users/gerrypesavento/Documents/sara/videosummary/localfiles/driveway/summary/person/frames/'+str(frame_number)+'.jpg'
@@ -65,7 +65,7 @@ for row in result:
 
     imgcv = cv2.imread(inImage) # opencv numby array format
 
-    color = (0,0,255) # blue box
+    color = (255,0,0) # blue box, BGR
     line_width = 2
 
     # write a bounding box over the image
