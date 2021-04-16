@@ -1,109 +1,139 @@
-# import the necessary packages
+#!/usr/bin/env python
 
-# python -m pip install -U scikit-image, Cython, numpy, scipi, matplotlib, networkx, pillow,
-# imageio, tifffile, PyWavelets
+# python -m pip install -U scikit-image
+# (also Cython, numpy, scipi, matplotlib, networkx, pillow, imageio, tifffile, PyWavelets)
 from skimage import data, img_as_float
 from skimage.metrics import structural_similarity as ssim
 from skimage.metrics import mean_squared_error
 import numpy as np # may not be needed
 import cv2
 import glob
+import numpy as np
+import os
+from os.path import isfile, join
 
-# funtion calc_ssim caclulate the "structural similarity" between 2 images x.jpg and y.jpg in path framePath
-# ssim is strucural image similarity ref: https://scikit-image.org/docs/dev/auto_examples/transform/plot_ssim.html
-def calc_ssim(framePath, x, y):
-    frame_x = cv2.imread(framePath+str(x)+'.jpg')
-    frame_y = cv2.imread(framePath+str(y)+'.jpg')
-    frame_x_bw = cv2.cvtColor(frame_x, cv2.COLOR_BGR2GRAY)
-    frame_y_bw = cv2.cvtColor(frame_y, cv2.COLOR_BGR2GRAY)
-    s = ssim(frame_x_bw, frame_y_bw)
-    return s
+# Creates an array of shot-change frames
+def ShotChange(full_frame_path):
+    print ('determining shot changes ...')
+    # create array of file images and sort them
+    files = [f for f in os.listdir(full_frame_path) if isfile(join(full_frame_path,f))]
+    files.sort()
+    # number of frames in folder
+    num = len(files)
+    # initialize the shot change array variable
+    # keep the very first frame as a scene change
+    shot_change = [0]
+    # initialize the first 3 frames
+    last_frame = 0
+    # calculate the ssim on the first 3 frames
+    frame_a = cv2.imread(full_frame_path+'frame0.jpg')
+    frame_b = cv2.imread(full_frame_path+'frame1.jpg')
+    frame_c = cv2.imread(full_frame_path+'frame2.jpg')
+    frame_a_bw = cv2.cvtColor(frame_a, cv2.COLOR_BGR2GRAY)
+    frame_b_bw = cv2.cvtColor(frame_b, cv2.COLOR_BGR2GRAY)
+    frame_c_bw = cv2.cvtColor(frame_c, cv2.COLOR_BGR2GRAY)
+    ssim_ab = ssim(frame_a_bw, frame_b_bw)
+    ssim_bc = ssim(frame_b_bw, frame_c_bw)
+    # now loop through all frames to look for "local minimums"
+    for i in range(0, num-3):
+        # read in four frames to opencv
+        frame_d = cv2.imread(full_frame_path+'frame'+str(i+3)+'.jpg')
+        # convert them to grayscale
+        frame_d_bw = cv2.cvtColor(frame_d, cv2.COLOR_BGR2GRAY)
+        # calculate ssim between adjacent frames
+        ssim_cd = ssim(frame_c_bw, frame_d_bw)
+        # we have ssim_ab, ssim_bc, ssim_cd ... we want to know if ssim_bc is a "local minimum"
+        # for now 0.6 is randomly chosen, seems to work OK
+        if (ssim_bc/ssim_ab < 0.6 and ssim_bc/ssim_cd < 0.6 and i-last_frame > 20):
+            # print ('shot change frame '+ str(i+2))
+            last_frame = i+2
+            # build the shot_change array with the frame numbers where change happens
+            shot_change.append(i+2)
+        # slide the window
+        ssim_ab = ssim_bc
+        ssim_bc = ssim_cd
+        frame_c_bw = frame_d_bw
+    print('shot change array is:')
+    print(shot_change)
+    return shot_change
 
-# calculates where to set the similarity threshold number
-# because every video is different in action, this samples 30 adjacent frames
-# and calculates the similarity theshold point about 20% above min value
-def similarity_threshold(framePath):
-    # the total number of image frames in framePath
-    total_num_frames = int(len(glob.glob1(framePath,"*.jpg")))
-    # use about 20 adjacent frames
-    y = int(total_num_frames/40)
-    x = y
-    min_sim = 1.0
-    max_sim = 0.0
-    set_threshold = 0.00
-    for i in range (1,30):
-        adjacent_sim = calc_ssim(framePath, x, x+1)
-        print ('similarity of frames '+str(x)+' and '+str(x+1)+' is '+str(adjacent_sim))
-        x = x + y
-        if (adjacent_sim < min_sim):
-            min_sim = adjacent_sim
-        if (adjacent_sim > max_sim):
-            max_sim = adjacent_sim
-    print('adjacent similarity range study: min_sim is '+str(min_sim)+ ', max_sim is '+str(max_sim))
-    threshold_point = min_sim + 0.2*(max_sim - min_sim)
-    print ('threshold_point '+str(threshold_point))
-    return threshold_point
+# Take each Shot section and reduce it 1:6
+# This is too simple, just taking every 6th frame, but identifying the shots
+def MakeSummaryFrames(full_frame_path,summary_frame_path, shot_change):
+    print ('storing summary frames in '+summary_frame_path+'...')
+    num_shots = len(shot_change)
+    z = 0
+    for i in range (0, num_shots-1):
+        frame_a = shot_change[i]
+        frame_b = shot_change[i+1]
+        num_frames_in_shot = frame_b - frame_a
+        num_frames_to_keep = int(num_frames_in_shot/6)
+        save_frame = frame_a
+        for y in range (0, num_frames_to_keep):
+            # save every 6th frame
+            save_frame = save_frame + 6
+            summary_image = full_frame_path+'frame'+str(save_frame)+'.jpg'
+            img = cv2.imread(summary_image)
+            # write the shot numbers on the summary frames
+            cv2.putText(
+                img, #numpy image
+                str(i), #text
+                (10,60), #position
+                cv2.FONT_HERSHEY_SIMPLEX, #font
+                2, #font size
+                (0, 0, 255), #font color red
+                4) #font stroke
+            alpha_number = str(save_frame).zfill(5)
+            summary_frame_img = summary_frame_path+alpha_number+'.jpg'
+            cv2.imwrite(summary_frame_img,img)
+            z = z+1
 
-# function to summarize video only keep frames that are different, above ssim threshold_point
-# framePath should contain sequential numbered images 1.jpg, 2.jpg etc
-def cull_frames(framePath, outPath):
+# Convert frames folder to video using OpenCV
+def FramesToVideo(summary_frame_path,pathOut,fps,frame_width,frame_height):
+    frame_array = []
+    files = [f for f in os.listdir(summary_frame_path) if isfile(join(summary_frame_path,f))]
+    # sort the files
+    # see python reference https://docs.python.org/3/howto/sorting.html
+    files.sort()
+    for i in range(len(files)):
+        filename=summary_frame_path+files[i]
+        #reading each files
+        img = cv2.imread(filename)
+        # height, width, layers = img.shape
+        # size = (width,height)
+        print(filename)
+        #inserting the frames into an image array
+        frame_array.append(img)
+    # define the parameters for creating the video
+    # .mp4 is a good choice for playing videos, works on OSX and Windows
+    fourcc = cv2.VideoWriter_fourcc(*'MP4V')
+    out = cv2.VideoWriter(pathOut, fourcc, fps, (frame_width,frame_height))
+    # create the video from frame array
+    for i in range(len(frame_array)):
+        # writing to a image array
+        out.write(frame_array[i])
+    out.release()
 
-    # the total number of image frames in framePath
-    total_num_frames = len(glob.glob1(framePath,"*.jpg"))
-
-    # get the similarity point to be used to determine if adjacent images are similar
-    similarity_point = similarity_threshold(framePath)
-
-    # starting point with first two adjacent images frames
-    x = 1
-    y = 2
-
-    # initialize a counter
-    counter = 0
-
-    # loop through all adjacent frames and only keep those that are different
-    for i in range (1, total_num_frames):
-
-        # calculate adjacent frame similarity
-        s = calc_ssim(framePath, x, y)
-
-        # the image to be kept in the outPath folder
-        outImage=outPath+str(y)+'.jpg'
-
-        if (s > similarity_point):
-            # the images are similar so don't keep y
-            y = y + 1
-            counter = counter + 1
-            if (counter > 10):
-                # we have reached the 10th similar image so keep y
-                print ('keep 10th frame image '+ str(y))
-                # read image into opencv
-                currentImage=cv2.imread(framePath+str(y)+'.jpg')
-                # add that image to the SSIM summary folder
-                cv2.imwrite(outImage, currentImage)
-                x = y
-                y = y + 1
-                counter = 0  # reset the counter
-        else:
-            # the images are different so keep y
-            print ('keep scene change image '+ str(y))
-            # read image into opencv
-            currentImage=cv2.imread(framePath+str(y)+'.jpg')
-            # add that image to the SSIM summary folder
-            cv2.imwrite(outImage, currentImage)
-            x = y
-            y = y + 1
-            counter = 0  # reset the counter
 
 def main():
-    # framePath is the directory where frames from the FULL video is located, should be ordered 1.jpg, 2.jpg, etc.
-    framePath = "/Users/gerrypesavento/Documents/sara/videosummary/localfiles/driveway/frames/"
 
-    # outPath is where the saved frames of the SSIM summary are put, make this folder in advance
-    outPath = '/Users/gerrypesavento/Documents/sara/videosummary/localfiles/driveway/summary/ssim/frames/'
+    # directory of full video frames - ordered frame1.jpg, frame2.jpg, etc.
+    full_frame_path = "../project_files/project_dataset/frames/meridian/"
 
-    # start
-    cull_frames(framePath, outPath)
+    # directory for summary frames
+    summary_frame_path = "../project_files/summary/meridian/frames/"
+
+    # directory for summary video
+    summary_video_path = '../project_files/summary/meridian/video/meridian.mp4'
+
+    # get shot_change array
+    shot_change = ShotChange(full_frame_path)
+
+    # make summary frame folder
+    MakeSummaryFrames(full_frame_path,summary_frame_path,shot_change)
+
+    # make a video from the summary frame folder
+    FramesToVideo(summary_frame_path, summary_video_path, 30, 320, 180)
 
 if __name__=="__main__":
     main()
