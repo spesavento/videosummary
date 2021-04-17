@@ -114,6 +114,25 @@ def FramesToVideo(summary_frame_path,pathOut,fps,frame_width,frame_height):
         out.write(frame_array[i])
     out.release()
 
+def FindFaces(img):
+    # Load classifier
+    face_classifier = cv2.CascadeClassifier('haarcascade_face_classifier.xml')
+    # Read the input image
+    img = cv2.imread(img)
+    # Convert into grayscale
+    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    # Detect faces
+    faces = face_classifier.detectMultiScale(gray, 1.1, 4)
+    # Draw rectangle around the faces
+    for (x, y, w, h) in faces:
+        cv2.rectangle(img, (x, y), (x+w, y+h), (255, 0, 0), 2)
+    # Display the output
+    # Note ... can store the output as array variable (shots that have faces)
+    cv2.imshow('img', img)
+    cv2.waitKey()
+    # to exit, while the image box is displaying, hit any key
+
+
 
 def main():
 
@@ -127,13 +146,15 @@ def main():
     summary_video_path = '../project_files/summary/meridian/video/meridian.mp4'
 
     # get shot_change array
-    shot_change = ShotChange(full_frame_path)
+    # shot_change = ShotChange(full_frame_path)
 
     # make summary frame folder
-    MakeSummaryFrames(full_frame_path,summary_frame_path,shot_change)
+    # MakeSummaryFrames(full_frame_path,summary_frame_path,shot_change)
 
     # make a video from the summary frame folder
-    FramesToVideo(summary_frame_path, summary_video_path, 30, 320, 180)
+    # FramesToVideo(summary_frame_path, summary_video_path, 30, 320, 180)
+
+    FindFaces('/Users/gerrypesavento/Documents/sara/videosummary/project_files/project_dataset/frames/meridian/frame1089.jpg')
 
 if __name__=="__main__":
     main()
