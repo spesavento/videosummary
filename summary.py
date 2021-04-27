@@ -16,6 +16,10 @@ import moviepy.editor as mpe
 import natsort
 import wave
 from PIL import Image
+from imutils.object_detection import non_max_suppression
+from imutils import paths
+import imutils
+
 
 def StructuredSimilarity(frames_jpg_path):
     # calculates the "structured similarity index" between adjacent frames
@@ -79,9 +83,6 @@ def FindFaces(shotchange_array, frames_jpg_path):
     face_classifier = cv2.CascadeClassifier('haarcascade_face_classifier.xml')
     # initialize array variable to record faces
     face_array = []
-    # read the number of frames
-    files = [f for f in os.listdir(frames_jpg_path) if isfile(join(frames_jpg_path,f))]
-    files.sort()
     # loop through the number of shots
     for x in range (0, len(shotchange_array)-1):
         frames_in_shot = shotchange_array[x+1] - shotchange_array[x] - 1
@@ -104,6 +105,35 @@ def FindFaces(shotchange_array, frames_jpg_path):
     face_array_normalized = preprocessing.minmax_scale(face_array, feature_range=(0, 1))
     face_array = [round(num, 4) for num in face_array_normalized]
     return(face_array)
+
+def FindPeople(shotchange_array, frames_jpg_path):
+    # OpenCV has a pre-trained person model using Histogram Oriented Gradients (HOG)
+    # and Linear SVM
+    hog = cv2.HOGDescriptor()
+    hog.setSVMDetector(cv2.HOGDescriptor_getDefaultPeopleDetector())
+    # initialize array variable to record faces
+    people_array = []
+    for x in range (0, len(shotchange_array)-1):
+        frames_in_shot = shotchange_array[x+1] - shotchange_array[x] - 1
+        people_total = 0
+        for y in range (shotchange_array[x], shotchange_array[x+1]-1):
+            # url of frame image to analyze
+            filename=frames_jpg_path+'frame'+str(y)+'.jpg'
+            # read it into OpenCV
+            image = cv2.imread(filename)
+            # resize the image to increase speed (may try this on face detect as well)
+            image = imutils.resize(image, width=min(400, image.shape[1]))
+            orig = image.copy()
+            # detect people in the image
+            (rects, weights) = hog.detectMultiScale(image, winStride=(4, 4), padding=(8, 8), scale=1.05)
+            for (x, y, w, h) in rects:
+                people_total = people_total + 1
+        people_array.append(people_total)
+    # return a normalized weighted array, value 0 to 1
+    people_array_normalized = preprocessing.minmax_scale(people_array, feature_range=(0, 1))
+    people_array = [round(num, 4) for num in people_array_normalized]
+    return(people_array)
+
 
 # Take each Shot section and reduce it 1:6
 # This is too simple, just taking every 6th frame, but identifying the shots
@@ -168,13 +198,13 @@ def main():
     # put in the directory of the frames and where the summary video will go
 
     # directory of full video frames - ordered frame1.jpg, frame2.jpg, etc.
-    frames_jpg_path = "../project_files/project_dataset/frames/meridian/"
+    frames_jpg_path = "../project_files/project_dataset/frames/soccer/"
 
     # directory for summary frames
-    summary_frame_path = "../project_files/summary/meridian/frames/"
+    summary_frame_path = "../project_files/summary/soccer/frames/"
 
     # directory for summary video
-    summary_video_path = '../project_files/summary/meridian/video/meridian.mp4'
+    summary_video_path = '../project_files/summary/meridian/video/soccer.mp4'
 
     # start processing
 
@@ -199,6 +229,12 @@ def main():
     print('\nface_array')
     face_array = FindFaces(shotchange_array, frames_jpg_path)
     print(str(face_array))
+
+    # get the people array
+    print('\npeople_array')
+    people_array = FindPeople(shotchange_array, frames_jpg_path)
+    print(str(people_array))
+
 
     # make summary frame folder
     # ShowShotChange(frames_jpg_path,summary_frame_path,shotchange_array)
