@@ -24,16 +24,15 @@ import imutils
 def StructuredSimilarity(frames_jpg_path):
     # calculates the "structured similarity index" between adjacent frames
     # ssim() looks at luminance, contrast and structure, it is a scikit-image function
-    # we use this for both Shot Change detection, and Action weight
-    # create array of file images and sort them
+    # we use ssim() for both (1) Shot Change detection, and (2) Action weight
     files = [f for f in os.listdir(frames_jpg_path) if isfile(join(frames_jpg_path,f))]
     files.sort()
     # initialize array
     ssi_array = []
     # number of adjacent frames
-    adjframes = len(files)-1
+    numadj = len(files)-2
     # loop through all adjacent frames and calculate the ssi
-    for i in range (0, adjframes):
+    for i in range (0, numadj):
         frame_a = cv2.imread(frames_jpg_path+'frame'+str(i)+'.jpg')
         frame_b = cv2.imread(frames_jpg_path+'frame'+str(i+1)+'.jpg')
         frame_a_bw = cv2.cvtColor(frame_a, cv2.COLOR_BGR2GRAY)
@@ -155,84 +154,93 @@ def MakeCollage(shotchange_array, frames_jpg_path):
         im_v = cv2.vconcat([im_v, im_h])
     cv2.imwrite('collage.jpg', im_v)
 
-# Take each Shot section and reduce it 1:6
-# This is too simple, just taking every 6th frame, but identifying the shots
-def ShowShotChange(frames_jpg_path,summary_frame_path, shot_change):
-    num_shots = len(shot_change)
-    z = 0
-    for i in range (0, num_shots-1):
-        frame_a = shot_change[i]
-        frame_b = shot_change[i+1]
-        num_frames_in_shot = frame_b - frame_a
-        num_frames_to_keep = int(num_frames_in_shot/6)
-        save_frame = frame_a
-        for y in range (0, num_frames_to_keep):
-            # save every 6th frame
-            save_frame = save_frame + 6
-            summary_image = frames_jpg_path+'frame'+str(save_frame)+'.jpg'
-            img = cv2.imread(summary_image)
-            # write the shot numbers on the summary frames
-            cv2.putText(
-                img, #numpy image
-                str(i), #text
-                (10,60), #position
-                cv2.FONT_HERSHEY_SIMPLEX, #font
-                2, #font size
-                (0, 0, 255), #font color red
-                4) #font stroke
-            alpha_number = str(save_frame).zfill(5)
-            summary_frame_img = summary_frame_path+alpha_number+'.jpg'
-            cv2.imwrite(summary_frame_img,img)
-            z = z+1
+def DecideShots(frames_jpg_path, shotchange_array, action_array, face_array, people_array):
+    # add the weigths, for now simply keep weighting equal
+    total_weight = []
+    total_weight = action_array + face_array + people_array
+    # we want 1/10th of the video
 
-# Convert frames folder to video using OpenCV
-def FramesToVideo(summary_frame_path,pathOut,fps,frame_width,frame_height):
-    frame_array = []
-    files = [f for f in os.listdir(summary_frame_path) if isfile(join(summary_frame_path,f))]
-    # sort the files
-    # see python reference https://docs.python.org/3/howto/sorting.html
-    files.sort()
-    for i in range(len(files)):
-        filename=summary_frame_path+files[i]
-        #reading each files
-        img = cv2.imread(filename)
-        # height, width, layers = img.shape
-        # size = (width,height)
-        print(filename)
-        #inserting the frames into an image array
-        frame_array.append(img)
-    # define the parameters for creating the video
-    # .mp4 is a good choice for playing videos, works on OSX and Windows
-    fourcc = cv2.VideoWriter_fourcc(*'MP4V')
-    out = cv2.VideoWriter(pathOut, fourcc, fps, (frame_width,frame_height))
-    # create the video from frame array
-    for i in range(len(frame_array)):
-        # writing to a image array
-        out.write(frame_array[i])
-    out.release()
+    # this will be location to decided which shots to accept
+
+
+
+# # Take each Shot section and reduce it 1:6
+# # This is too simple, just taking every 6th frame, but identifying the shots
+# def ShowShotChange(frames_jpg_path,summary_frame_path, shot_change):
+#     num_shots = len(shot_change)
+#     z = 0
+#     for i in range (0, num_shots-1):
+#         frame_a = shot_change[i]
+#         frame_b = shot_change[i+1]
+#         num_frames_in_shot = frame_b - frame_a
+#         num_frames_to_keep = int(num_frames_in_shot/6)
+#         save_frame = frame_a
+#         for y in range (0, num_frames_to_keep):
+#             # save every 6th frame
+#             save_frame = save_frame + 6
+#             summary_image = frames_jpg_path+'frame'+str(save_frame)+'.jpg'
+#             img = cv2.imread(summary_image)
+#             # write the shot numbers on the summary frames
+#             cv2.putText(
+#                 img, #numpy image
+#                 str(i), #text
+#                 (10,60), #position
+#                 cv2.FONT_HERSHEY_SIMPLEX, #font
+#                 2, #font size
+#                 (0, 0, 255), #font color red
+#                 4) #font stroke
+#             alpha_number = str(save_frame).zfill(5)
+#             summary_frame_img = summary_frame_path+alpha_number+'.jpg'
+#             cv2.imwrite(summary_frame_img,img)
+#             z = z+1
+
+# # Convert frames folder to video using OpenCV
+# def FramesToVideo(summary_frame_path,pathOut,fps,frame_width,frame_height):
+#     frame_array = []
+#     files = [f for f in os.listdir(summary_frame_path) if isfile(join(summary_frame_path,f))]
+#     # sort the files
+#     # see python reference https://docs.python.org/3/howto/sorting.html
+#     files.sort()
+#     for i in range(len(files)):
+#         filename=summary_frame_path+files[i]
+#         #reading each files
+#         img = cv2.imread(filename)
+#         # height, width, layers = img.shape
+#         # size = (width,height)
+#         print(filename)
+#         #inserting the frames into an image array
+#         frame_array.append(img)
+#     # define the parameters for creating the video
+#     # .mp4 is a good choice for playing videos, works on OSX and Windows
+#     fourcc = cv2.VideoWriter_fourcc(*'MP4V')
+#     out = cv2.VideoWriter(pathOut, fourcc, fps, (frame_width,frame_height))
+#     # create the video from frame array
+#     for i in range(len(frame_array)):
+#         # writing to a image array
+#         out.write(frame_array[i])
+#     out.release()
 
 
 
 def main():
 
-    # put in the directory of the frames and where the summary video will go
+    # name of the video to process
+    video_name = 'soccer'
 
-    # directory of full video frames - ordered frame1.jpg, frame2.jpg, etc.
-    frames_jpg_path = "../project_files/project_dataset/frames/soccer/"
+    # video jpg frames to be analyzed - ordered exactly like frame1.jpg, frame2.jpg, etc.
+    frames_jpg_path = '../project_files/project_dataset/frames/'+video_name+'/'
 
-    # directory for summary frames
-    summary_frame_path = "../project_files/summary/soccer/frames/"
-
-    # directory for summary video
-    summary_video_path = '../project_files/summary/soccer/video/soccer.mp4'
+    # make directory for summary frames and summary video
+    summary_frame_path = '../project_files/summary/'+video_name+'/frames/'
+    summary_video_path = '../project_files/summary/'+video_name+'/summary.mp4'
 
     # start processing
 
     # get ssi_array, the structured similarity between adjacent frames
     print ('\nssi_array')
-    print ('the similarity between adjacent frames ... takes a minute')
+    print ('the similarity between adjacent frames ... takes a long minute')
     ssi_array = StructuredSimilarity(frames_jpg_path)
-    print(str(ssi_array[0 : 50])+' ... long')
+    print(str(ssi_array[0 : 50])+' ... more')
 
     # get the shotchange_array, which are the shot boundary frames
     print ('\nshotchange_array')
@@ -256,7 +264,12 @@ def main():
     print(str(people_array))
 
     # make a collage of the shots
-    # MakeCollage(shotchange_array, frames_jpg_path):
+    print('\na photo collage of scenes saved as collage.jpg in the root folder')
+    MakeCollage(shotchange_array, frames_jpg_path)
+
+    # decide which shots to use
+    print('\ndeciding which shots to use')
+    DecideShots(frames_jpg_path, shotchange_array, action_array, face_array, people_array)
 
     # make summary frame folder
     # ShowShotChange(frames_jpg_path,summary_frame_path,shotchange_array)
