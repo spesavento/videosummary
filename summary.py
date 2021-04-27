@@ -32,8 +32,8 @@ def FrameSimilarity(frames_jpg_path):
     # number of adjacent frames
     numadj = len(files)-2
     # loop through all adjacent frames and calculate the ssi
-    # for i in range (0, numadj):
-    for i in range (0, 4000):
+    for i in range (0, numadj):
+    # for i in range (0, 4000):
         frame_a = cv2.imread(frames_jpg_path+'frame'+str(i)+'.jpg')
         frame_b = cv2.imread(frames_jpg_path+'frame'+str(i+1)+'.jpg')
         frame_a_bw = cv2.cvtColor(frame_a, cv2.COLOR_BGR2GRAY)
@@ -247,7 +247,7 @@ def MakeCollage(framechange_array, frames_jpg_path, summary_frame_path):
 def main():
 
     # name of the video to process
-    video_name = 'soccer'
+    video_name = 'meridian'
 
     # jpg video frames to be analyzed - ordered frame1.jpg, frame2.jpg, etc.
     frames_jpg_path = '../project_files/project_dataset/frames/'+video_name+'/'
@@ -311,7 +311,7 @@ def main():
 
     # optional - make a photo collage of the shots
     print('\nbonus: photo collage of scenes saved as collage.jpg in the root folder')
-    MakeCollage(framechange_array, frames_jpg_path)
+    MakeCollage(framechange_array, frames_jpg_path, summary_frame_path)
 
 
 if __name__=="__main__":
