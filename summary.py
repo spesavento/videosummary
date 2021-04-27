@@ -222,7 +222,7 @@ def FramesToVideo(summary_frame_path,pathOut,fps,frame_width,frame_height):
         out.write(frame_array[i])
     out.release()
 
-def MakeCollage(framechange_array, frames_jpg_path, summary_frame_path):
+def MakeCollage(framechange_array, frames_jpg_path, collage_path):
     # creates a collage of the shots in a video
     offset = 30
     i = 0
@@ -241,20 +241,21 @@ def MakeCollage(framechange_array, frames_jpg_path, summary_frame_path):
         cv2.putText(im_e, str(x+4), (10,60), cv2.FONT_HERSHEY_SIMPLEX, 2, (255, 0, 0), 4)
         im_h = cv2.hconcat([im_a, im_b, im_c, im_d, im_e])
         im_v = cv2.vconcat([im_v, im_h])
-    cv2.imwrite(summary_frame_path+'collage.jpg', im_v)
+    cv2.imwrite(collage_path, im_v)
 
 
 def main():
 
     # name of the video to process
-    video_name = 'meridian'
+    video_name = 'concert'
 
     # jpg video frames to be analyzed - ordered frame1.jpg, frame2.jpg, etc.
     frames_jpg_path = '../project_files/project_dataset/frames/'+video_name+'/'
 
-    # make directory for summary frames and summary video
+    # directory for summary frames and summary video
     summary_frame_path = '../project_files/summary/'+video_name+'/frames/'
     summary_video_path = '../project_files/summary/'+video_name+'/summary.mp4'
+    collage_path = '../project_files/summary/'+video_name+'/collage.jpg'
 
     # start processing the video
 
@@ -311,7 +312,7 @@ def main():
 
     # optional - make a photo collage of the shots
     print('\nbonus: photo collage of scenes saved as collage.jpg in the root folder')
-    MakeCollage(framechange_array, frames_jpg_path, summary_frame_path)
+    MakeCollage(framechange_array, frames_jpg_path, collage_path)
 
 
 if __name__=="__main__":
