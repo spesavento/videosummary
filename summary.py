@@ -134,6 +134,26 @@ def FindPeople(shotchange_array, frames_jpg_path):
     people_array = [round(num, 4) for num in people_array_normalized]
     return(people_array)
 
+def MakeCollage(shotchange_array, frames_jpg_path):
+    # creates a collage of the shots in a video
+    offset = 30
+    i = 0
+    # start with a blank image that is the same width (1600px) of 5 frames
+    im_v = cv2.imread('top.jpg')
+    for x in range (0, len(shotchange_array)-5, 5):
+        im_a = cv2.imread(frames_jpg_path+'frame'+str(shotchange_array[x]+offset)+'.jpg')
+        im_b = cv2.imread(frames_jpg_path+'frame'+str(shotchange_array[x+1]+offset)+'.jpg')
+        im_c = cv2.imread(frames_jpg_path+'frame'+str(shotchange_array[x+2]+offset)+'.jpg')
+        im_d = cv2.imread(frames_jpg_path+'frame'+str(shotchange_array[x+3]+offset)+'.jpg')
+        im_e = cv2.imread(frames_jpg_path+'frame'+str(shotchange_array[x+4]+offset)+'.jpg')
+        cv2.putText(im_a, str(x), (10,60), cv2.FONT_HERSHEY_SIMPLEX, 2, (255, 0, 0), 4)
+        cv2.putText(im_b, str(x+1), (10,60), cv2.FONT_HERSHEY_SIMPLEX, 2, (255, 0, 0), 4)
+        cv2.putText(im_c, str(x+2), (10,60), cv2.FONT_HERSHEY_SIMPLEX, 2, (255, 0, 0), 4)
+        cv2.putText(im_d, str(x+3), (10,60), cv2.FONT_HERSHEY_SIMPLEX, 2, (255, 0, 0), 4)
+        cv2.putText(im_e, str(x+4), (10,60), cv2.FONT_HERSHEY_SIMPLEX, 2, (255, 0, 0), 4)
+        im_h = cv2.hconcat([im_a, im_b, im_c, im_d, im_e])
+        im_v = cv2.vconcat([im_v, im_h])
+    cv2.imwrite('collage.jpg', im_v)
 
 # Take each Shot section and reduce it 1:6
 # This is too simple, just taking every 6th frame, but identifying the shots
@@ -204,7 +224,7 @@ def main():
     summary_frame_path = "../project_files/summary/soccer/frames/"
 
     # directory for summary video
-    summary_video_path = '../project_files/summary/meridian/video/soccer.mp4'
+    summary_video_path = '../project_files/summary/soccer/video/soccer.mp4'
 
     # start processing
 
@@ -235,6 +255,8 @@ def main():
     people_array = FindPeople(shotchange_array, frames_jpg_path)
     print(str(people_array))
 
+    # make a collage of the shots
+    # MakeCollage(shotchange_array, frames_jpg_path):
 
     # make summary frame folder
     # ShowShotChange(frames_jpg_path,summary_frame_path,shotchange_array)
