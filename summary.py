@@ -149,10 +149,12 @@ def FindPeople(framechange_array, frames_jpg_path):
 def TotalWeights(shot_array, action_array, face_array, people_array):
     # use numpy to add the weight arrays
     # for now a simple addition of action, face, people weights
+    face_array_scaled = [element * 0.5 for element in face_array]
+    people_array_scaled = [element * 0.5 for element in people_array]
     arr = []
     arr.append(action_array)
-    arr.append(face_array)
-    arr.append(people_array)
+    arr.append(face_array_scaled)
+    arr.append(people_array_scaled)
     np_arr = np.array(arr)
     np_weight = np_arr.sum(axis=0)
     total_weight = list(np.around(np.array(np_weight),3))
@@ -167,6 +169,9 @@ def SaveSummaryFrames(totalweight_array, summary_frame_path, frames_jpg_path):
     # with weighted shots, save the summary frames into summary_frame_path
     # sort the array by weight descending, best shots first
     sorted_array = sorted(totalweight_array, key=lambda x: x[2], reverse=True)
+    print('\nsorted_array')
+    print('shots ordered by highest weight first')
+    print(str(sorted_array))
     frame_count = 0
     summary_array = []
     ordered_array = []
@@ -183,13 +188,18 @@ def SaveSummaryFrames(totalweight_array, summary_frame_path, frames_jpg_path):
             summary_array.insert(x, sorted_array[x])
     # ordered array sort by shot start frame number
     ordered_array = sorted(summary_array, key=lambda x: x[0])
+    print('\nordered_array')
+    print('shots trimmed down to < 2700 frames, ordered by scene number')
+    print(str(ordered_array))
     num_shots=len(ordered_array)
     # create a numeric list 0000, 0001, to 9999
     numlist = ["%04d" % x for x in range(10000)]
     count = 0
-    for y in range (0,num_shots-1):
+    print(str(num_shots))
+    for y in range (0,num_shots):
         start = ordered_array[y][0]
         end = ordered_array[y][1]
+        print(str(start))
         for z in range (start, end):
             shot_image = frames_jpg_path+'frame'+str(z)+'.jpg'
             img = cv2.imread(shot_image)
@@ -247,9 +257,9 @@ def MakeCollage(framechange_array, frames_jpg_path, collage_path):
 def main():
 
     # name of the video to process
-    video_name = 'concert'
+    video_name = 'meridian'
 
-    # jpg video frames to be analyzed - ordered frame1.jpg, frame2.jpg, etc.
+    # jpg video frames to be analyzed - ordered frame0.jpg, frame1.jpg, etc.
     frames_jpg_path = '../project_files/project_dataset/frames/'+video_name+'/'
 
     # directory for summary frames and summary video
@@ -302,7 +312,6 @@ def main():
     print(str(totalweight_array))
 
     # create summary frames in a folder
-    print('\nfrom total weights, saving the summary frames in a folder')
     SaveSummaryFrames(totalweight_array,summary_frame_path, frames_jpg_path)
 
     # create summary video
