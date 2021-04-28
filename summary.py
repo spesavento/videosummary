@@ -195,11 +195,11 @@ def SaveSummaryFrames(totalweight_array, summary_frame_path, frames_jpg_path):
     # create a numeric list 0000, 0001, to 9999
     numlist = ["%04d" % x for x in range(10000)]
     count = 0
-    print(str(num_shots))
+    # print(str(num_shots))
     for y in range (0,num_shots):
         start = ordered_array[y][0]
         end = ordered_array[y][1]
-        print(str(start))
+        # print(str(start))
         for z in range (start, end):
             shot_image = frames_jpg_path+'frame'+str(z)+'.jpg'
             img = cv2.imread(shot_image)
@@ -257,7 +257,7 @@ def MakeCollage(framechange_array, frames_jpg_path, collage_path):
 def main():
 
     # name of the video to process
-    video_name = 'meridian'
+    video_name = 'soccer'
 
     # jpg video frames to be analyzed - ordered frame0.jpg, frame1.jpg, etc.
     frames_jpg_path = '../project_files/project_dataset/frames/'+video_name+'/'
