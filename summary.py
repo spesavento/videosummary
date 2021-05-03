@@ -60,7 +60,7 @@ def FrameChange(ssi_array):
         ssim_bc = ssi_array[i+1]
         ssim_cd = ssi_array[i+2]
         # 0.6 is chosen because a 60% change in similarity works well for a shot change threshold
-        if (ssim_bc/ssim_ab < 0.6 and ssim_bc/ssim_cd < 0.6 and i-last_hit > 30):
+        if (ssim_bc/ssim_ab < 0.6 and ssim_bc/ssim_cd < 0.6 and i-last_hit > 22):
             framechange_array.append(i+2)
             last_hit = i+2
     # add the last frame to the array to the end if last frame is more than last shot change
@@ -275,13 +275,13 @@ def MakeCollage(framechange_array, frames_jpg_path, collage_path):
         cv2.putText(im_f, str(x+5), (10,50), cv2.FONT_HERSHEY_SIMPLEX, 2, (0, 0, 255), 4)
         cv2.putText(im_g, str(x+6), (10,50), cv2.FONT_HERSHEY_SIMPLEX, 2, (0, 0, 255), 4)
         # add the frame numbers to the collage images
-        cv2.putText(im_a, str(framechange_array[x]), (100,30), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 4)
-        cv2.putText(im_b, str(framechange_array[x+1]), (100,30), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 4)
-        cv2.putText(im_c, str(framechange_array[x+2]), (100,30), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 4)
-        cv2.putText(im_d, str(framechange_array[x+3]), (100,30), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 4)
-        cv2.putText(im_e, str(framechange_array[x+4]), (100,30), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 4)
-        cv2.putText(im_f, str(framechange_array[x+5]), (100,30), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 4)
-        cv2.putText(im_g, str(framechange_array[x+6]), (100,30), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 4)
+        cv2.putText(im_a, str(framechange_array[x]), (120,30), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 4)
+        cv2.putText(im_b, str(framechange_array[x+1]), (120,30), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 4)
+        cv2.putText(im_c, str(framechange_array[x+2]), (120,30), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 4)
+        cv2.putText(im_d, str(framechange_array[x+3]), (120,30), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 4)
+        cv2.putText(im_e, str(framechange_array[x+4]), (120,30), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 4)
+        cv2.putText(im_f, str(framechange_array[x+5]), (120,30), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 4)
+        cv2.putText(im_g, str(framechange_array[x+6]), (120,30), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 4)
         # build the collage
         im_h = cv2.hconcat([im_a, im_b, im_c, im_d, im_e, im_f, im_g])
         im_v = cv2.vconcat([im_v, im_h])
@@ -291,7 +291,7 @@ def MakeCollage(framechange_array, frames_jpg_path, collage_path):
 def main():
 
     # name of the video to process
-    video_name = 'concert'
+    video_name = 'superbowl_2'
 
     # jpg video frames to be analyzed - ordered frame0.jpg, frame1.jpg, etc.
     frames_jpg_path = '../project_files/project_dataset/frames/'+video_name+'/'
