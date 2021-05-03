@@ -23,6 +23,9 @@ from skimage.metrics import structural_similarity as ssim
 from skimage import io
 from sklearn import preprocessing
 
+is_cropped = 0 #1 is yes, use centering
+cutoff = 0.6 #ssim cutoff
+
 def FrameSimilarity(frames_jpg_path):
     # calculates the "structured similarity index" between adjacent frames
     # ssim() looks at luminance, contrast and structure, it is a scikit-image function
@@ -39,8 +42,12 @@ def FrameSimilarity(frames_jpg_path):
         frame_a = cv2.imread(frames_jpg_path+'frame'+str(i)+'.jpg')
         frame_b = cv2.imread(frames_jpg_path+'frame'+str(i+1)+'.jpg')
         # crop frame images to center-weight them
-        crop_img_a = frame_a[20:160, 50:270] #y1:y2 x1:x2 orginal is 320 w x 180 h
-        crop_img_b = frame_b[20:160, 50:270]
+        if(is_cropped):
+            crop_img_a = frame_a[20:160, 50:270] #y1:y2 x1:x2 orginal is 320 w x 180 h
+            crop_img_b = frame_b[20:160, 50:270]
+        else:
+            crop_img_a = frame_a
+            crop_img_b = frame_b
         frame_a_bw = cv2.cvtColor(crop_img_a, cv2.COLOR_BGR2GRAY)
         frame_b_bw = cv2.cvtColor(crop_img_b, cv2.COLOR_BGR2GRAY)
         ssim_ab = ssim(frame_a_bw, frame_b_bw)
@@ -63,7 +70,7 @@ def FrameChange(ssi_array):
         ssim_bc = ssi_array[i+1]
         ssim_cd = ssi_array[i+2]
         # 0.6 is chosen because a 60% change in similarity works well for a shot change threshold
-        if (ssim_bc/ssim_ab < 0.6 and ssim_bc/ssim_cd < 0.6 and i-last_hit > 22):
+        if (ssim_bc/ssim_ab < cutoff and ssim_bc/ssim_cd < cutoff and i-last_hit > 22):
             framechange_array.append(i+2)
             last_hit = i+2
     # add the last frame to the array to the end if last frame is more than last shot change
