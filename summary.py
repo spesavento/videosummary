@@ -36,8 +36,10 @@ def FrameSimilarity(frames_jpg_path):
     # for i in range (0, 4000):
         frame_a = cv2.imread(frames_jpg_path+'frame'+str(i)+'.jpg')
         frame_b = cv2.imread(frames_jpg_path+'frame'+str(i+1)+'.jpg')
-        frame_a_bw = cv2.cvtColor(frame_a, cv2.COLOR_BGR2GRAY)
-        frame_b_bw = cv2.cvtColor(frame_b, cv2.COLOR_BGR2GRAY)
+        crop_img_a = frame_a[20:160, 50:270] #y1:y2 x1:x2 orginal is 320 w x 180 h
+        crop_img_b = frame_b[20:160, 50:270]
+        frame_a_bw = cv2.cvtColor(crop_img_a, cv2.COLOR_BGR2GRAY)
+        frame_b_bw = cv2.cvtColor(crop_img_b, cv2.COLOR_BGR2GRAY)
         ssim_ab = ssim(frame_a_bw, frame_b_bw)
         ssim_ab = round(ssim_ab, 3)
         ssi_array.append(ssim_ab)
@@ -55,7 +57,7 @@ def FrameChange(ssi_array):
         ssim_bc = ssi_array[i+1]
         ssim_cd = ssi_array[i+2]
         # 0.6 is chosen because a 60% change in similarity works well for a shot change threshold
-        if (ssim_bc/ssim_ab < 0.6 and ssim_bc/ssim_cd < 0.6 and i-last_hit > 20):
+        if (ssim_bc/ssim_ab < 0.6 and ssim_bc/ssim_cd < 0.6 and i-last_hit > 25):
             framechange_array.append(i+2)
             last_hit = i+2
     return (framechange_array)
@@ -257,7 +259,7 @@ def MakeCollage(framechange_array, frames_jpg_path, collage_path):
 def main():
 
     # name of the video to process
-    video_name = 'soccer'
+    video_name = 'meridian'
 
     # jpg video frames to be analyzed - ordered frame0.jpg, frame1.jpg, etc.
     frames_jpg_path = '../project_files/project_dataset/frames/'+video_name+'/'
@@ -266,6 +268,16 @@ def main():
     summary_frame_path = '../project_files/summary/'+video_name+'/frames/'
     summary_video_path = '../project_files/summary/'+video_name+'/summary.mp4'
     collage_path = '../project_files/summary/'+video_name+'/collage.jpg'
+
+    # empty the summary folders and summary results
+    print ('\nremoving previous files in summary folder and summary results')
+    filesToRemove = [os.path.join(summary_frame_path,f) for f in os.listdir(summary_frame_path)]
+    for f in filesToRemove:
+        os.remove(f)
+    if os.path.exists(summary_video_path):
+        os.remove(summary_video_path)
+    if os.path.exists(collage_path):
+        os.remove(collage_path)
 
     # start processing the video
 
