@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 
-
 import numpy as np
 import cv2
 import numpy as np
@@ -39,6 +38,7 @@ def FrameSimilarity(frames_jpg_path):
     # for i in range (0, 3000):
         frame_a = cv2.imread(frames_jpg_path+'frame'+str(i)+'.jpg')
         frame_b = cv2.imread(frames_jpg_path+'frame'+str(i+1)+'.jpg')
+        # crop frame images to center-weight them
         crop_img_a = frame_a[20:160, 50:270] #y1:y2 x1:x2 orginal is 320 w x 180 h
         crop_img_b = frame_b[20:160, 50:270]
         frame_a_bw = cv2.cvtColor(crop_img_a, cv2.COLOR_BGR2GRAY)
@@ -63,6 +63,9 @@ def FrameChange(ssi_array):
         if (ssim_bc/ssim_ab < 0.6 and ssim_bc/ssim_cd < 0.6 and i-last_hit > 25):
             framechange_array.append(i+2)
             last_hit = i+2
+    # add the last frame to the array to the end if last frame is more than last shot change
+    if num-1 > framechange_array[-1] + 4:
+        framechange_array.append(num-1)
     return (framechange_array)
 
 def ShotArray(framechange_array):
@@ -247,10 +250,12 @@ def FramesToVideo(summary_frame_path,pathOut,fps,frame_width,frame_height):
     out.release()
 
 def MakeCollage(framechange_array, frames_jpg_path, collage_path):
-    # creates a collage of the shots in a video
-    offset = 30
+    # creates a collage of the shots in a video, the collage shows shot # and frame #
+    # imporant - the top.jpg must be in the folder path, and it has to be exact width of 2240px
+    # take the frame one forward of the shot change
+    offset = 1
     i = 0
-    # start with a blank image that is the same width (1600px) of 5 frames
+    # start with a blank image that is the same width (2240px) of 7 frames
     im_v = cv2.imread('top.jpg')
     for x in range (0, len(framechange_array)-5, 5):
         im_a = cv2.imread(frames_jpg_path+'frame'+str(framechange_array[x]+offset)+'.jpg')
@@ -258,12 +263,26 @@ def MakeCollage(framechange_array, frames_jpg_path, collage_path):
         im_c = cv2.imread(frames_jpg_path+'frame'+str(framechange_array[x+2]+offset)+'.jpg')
         im_d = cv2.imread(frames_jpg_path+'frame'+str(framechange_array[x+3]+offset)+'.jpg')
         im_e = cv2.imread(frames_jpg_path+'frame'+str(framechange_array[x+4]+offset)+'.jpg')
-        cv2.putText(im_a, str(x), (10,60), cv2.FONT_HERSHEY_SIMPLEX, 2, (255, 0, 0), 4)
-        cv2.putText(im_b, str(x+1), (10,60), cv2.FONT_HERSHEY_SIMPLEX, 2, (255, 0, 0), 4)
-        cv2.putText(im_c, str(x+2), (10,60), cv2.FONT_HERSHEY_SIMPLEX, 2, (255, 0, 0), 4)
-        cv2.putText(im_d, str(x+3), (10,60), cv2.FONT_HERSHEY_SIMPLEX, 2, (255, 0, 0), 4)
-        cv2.putText(im_e, str(x+4), (10,60), cv2.FONT_HERSHEY_SIMPLEX, 2, (255, 0, 0), 4)
-        im_h = cv2.hconcat([im_a, im_b, im_c, im_d, im_e])
+        im_f = cv2.imread(frames_jpg_path+'frame'+str(framechange_array[x+5]+offset)+'.jpg')
+        im_g = cv2.imread(frames_jpg_path+'frame'+str(framechange_array[x+6]+offset)+'.jpg')
+        # add the shot numbers to the collage images
+        cv2.putText(im_a, str(x), (10,50), cv2.FONT_HERSHEY_SIMPLEX, 2, (0, 0, 255), 4)
+        cv2.putText(im_b, str(x+1), (10,50), cv2.FONT_HERSHEY_SIMPLEX, 2, (0, 0, 255), 4)
+        cv2.putText(im_c, str(x+2), (10,50), cv2.FONT_HERSHEY_SIMPLEX, 2, (0, 0, 255), 4)
+        cv2.putText(im_d, str(x+3), (10,50), cv2.FONT_HERSHEY_SIMPLEX, 2, (0, 0, 255), 4)
+        cv2.putText(im_e, str(x+4), (10,50), cv2.FONT_HERSHEY_SIMPLEX, 2, (0, 0, 255), 4)
+        cv2.putText(im_f, str(x+5), (10,50), cv2.FONT_HERSHEY_SIMPLEX, 2, (0, 0, 255), 4)
+        cv2.putText(im_g, str(x+6), (10,50), cv2.FONT_HERSHEY_SIMPLEX, 2, (0, 0, 255), 4)
+        # add the frame numbers to the collage images
+        cv2.putText(im_a, str(framechange_array[x]), (100,30), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 4)
+        cv2.putText(im_b, str(framechange_array[x+1]), (100,30), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 4)
+        cv2.putText(im_c, str(framechange_array[x+2]), (100,30), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 4)
+        cv2.putText(im_d, str(framechange_array[x+3]), (100,30), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 4)
+        cv2.putText(im_e, str(framechange_array[x+4]), (100,30), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 4)
+        cv2.putText(im_f, str(framechange_array[x+5]), (100,30), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 4)
+        cv2.putText(im_g, str(framechange_array[x+6]), (100,30), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 4)
+        # build the collage
+        im_h = cv2.hconcat([im_a, im_b, im_c, im_d, im_e, im_f, im_g])
         im_v = cv2.vconcat([im_v, im_h])
     cv2.imwrite(collage_path, im_v)
 
@@ -279,18 +298,15 @@ def main():
     # directory for summary frames and summary video
     summary_frame_path = '../project_files/summary/'+video_name+'/frames/'
     summary_video_path = '../project_files/summary/'+video_name+'/summary.mp4'
-    shot_video_path = '../project_files/summary/'+video_name+'/shots.mp4'
     collage_path = '../project_files/summary/'+video_name+'/collage.jpg'
 
     # empty the summary folders and summary results
-    print ('\nremoving previous files in summary folder and summary results')
+    print ('\nremoving all previous summary files in summary/shot folders')
     filesToRemove = [os.path.join(summary_frame_path,f) for f in os.listdir(summary_frame_path)]
     for f in filesToRemove:
         os.remove(f)
     if os.path.exists(summary_video_path):
         os.remove(summary_video_path)
-    if os.path.exists(shot_video_path):
-        os.remove(shot_video_path)
     if os.path.exists(collage_path):
         os.remove(collage_path)
 
@@ -343,11 +359,6 @@ def main():
     print('\nfrom the summary frames, creating a summary video')
     FramesToVideo(summary_frame_path, summary_video_path, 30, 320, 180)
     print('the summary video is stored as '+summary_video_path)
-
-    # optional - make a shot-summary video showing shot numbers, sped up video
-    # print('\nfrom the summary frames, creating a shot video, all shots, sped up')
-    # MakeShotVideo(summary_frame_path, shot_video_path, 30, 320, 180)
-    # print('the shot video is stored as '+shot_video_path)
 
     # optional - make a photo collage of the shots
     print('\nbonus: photo collage of scenes saved as collage.jpg in the root folder')
