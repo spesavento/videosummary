@@ -1,11 +1,8 @@
 #!/usr/bin/env python
 
-#from skimage import data, img_as_float
-#from skimage.metrics import structural_similarity as ssim
-#from skimage import io
-#from sklearn import preprocessing
+
 import numpy as np
-#import cv2
+import cv2
 import numpy as np
 import pickle as pl
 import struct
@@ -20,6 +17,12 @@ from imutils.object_detection import non_max_suppression
 from imutils import paths
 import imutils
 from array import *
+from skimage import data, img_as_float
+from skimage.metrics import structural_similarity as ssim
+from skimage import data, img_as_float
+from skimage.metrics import structural_similarity as ssim
+from skimage import io
+from sklearn import preprocessing
 
 def FrameSimilarity(frames_jpg_path):
     # calculates the "structured similarity index" between adjacent frames
@@ -33,7 +36,7 @@ def FrameSimilarity(frames_jpg_path):
     numadj = len(files)-2
     # loop through all adjacent frames and calculate the ssi
     for i in range (0, numadj):
-    # for i in range (0, 4000):
+    # for i in range (0, 3000):
         frame_a = cv2.imread(frames_jpg_path+'frame'+str(i)+'.jpg')
         frame_b = cv2.imread(frames_jpg_path+'frame'+str(i+1)+'.jpg')
         crop_img_a = frame_a[20:160, 50:270] #y1:y2 x1:x2 orginal is 320 w x 180 h
@@ -206,6 +209,15 @@ def SaveSummaryFrames(totalweight_array, summary_frame_path, frames_jpg_path):
             shot_image = frames_jpg_path+'frame'+str(z)+'.jpg'
             img = cv2.imread(shot_image)
             summary_image = summary_frame_path+numlist[count]+'.jpg'
+            # add shot number to frame
+            cv2.putText(
+                img, #numpy image
+                str(y), #text
+                (10,60), #position
+                cv2.FONT_HERSHEY_SIMPLEX, #font
+                2, #font size
+                (0, 0, 255), #font color red
+                4) #font stroke
             cv2.imwrite(summary_image,img)
             count = count+1
 
@@ -267,6 +279,7 @@ def main():
     # directory for summary frames and summary video
     summary_frame_path = '../project_files/summary/'+video_name+'/frames/'
     summary_video_path = '../project_files/summary/'+video_name+'/summary.mp4'
+    shot_video_path = '../project_files/summary/'+video_name+'/shots.mp4'
     collage_path = '../project_files/summary/'+video_name+'/collage.jpg'
 
     # empty the summary folders and summary results
@@ -276,6 +289,8 @@ def main():
         os.remove(f)
     if os.path.exists(summary_video_path):
         os.remove(summary_video_path)
+    if os.path.exists(shot_video_path):
+        os.remove(shot_video_path)
     if os.path.exists(collage_path):
         os.remove(collage_path)
 
@@ -329,10 +344,14 @@ def main():
     FramesToVideo(summary_frame_path, summary_video_path, 30, 320, 180)
     print('the summary video is stored as '+summary_video_path)
 
+    # optional - make a shot-summary video showing shot numbers, sped up video
+    # print('\nfrom the summary frames, creating a shot video, all shots, sped up')
+    # MakeShotVideo(summary_frame_path, shot_video_path, 30, 320, 180)
+    # print('the shot video is stored as '+shot_video_path)
+
     # optional - make a photo collage of the shots
     print('\nbonus: photo collage of scenes saved as collage.jpg in the root folder')
     MakeCollage(framechange_array, frames_jpg_path, collage_path)
-
 
 if __name__=="__main__":
     main()
