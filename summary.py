@@ -279,8 +279,6 @@ def main():
     if os.path.exists(collage_path):
         os.remove(collage_path)
 
-    # start processing the video
-
     # get ssi_array, the structured similarity between adjacent frames
     print ('\nssi_array')
     print ('the similarity between adjacent frames ... takes a long minute')
