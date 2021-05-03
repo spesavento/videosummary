@@ -20,7 +20,6 @@ def ShotChange(full_frame_path):
     files.sort()
     # number of frames in folder
     num = len(files)
-    print(num)
     # initialize the shot change array variable
     # keep the very first frame as a scene change
     shot_change = [0]
@@ -30,61 +29,30 @@ def ShotChange(full_frame_path):
     frame_a = cv2.imread(full_frame_path+'frame0.jpg')
     frame_b = cv2.imread(full_frame_path+'frame1.jpg')
     frame_c = cv2.imread(full_frame_path+'frame2.jpg')
-    crop_img_a = frame_a[20:160, 50:270] #y1:y2 x1:x2 #320 w x 180 h
-    crop_img_b = frame_b[20:160, 50:270]
-    crop_img_c = frame_c[20:160, 50:270]
-    frame_a_bw = cv2.cvtColor(crop_img_a, cv2.COLOR_BGR2GRAY)
-    frame_b_bw = cv2.cvtColor(crop_img_b, cv2.COLOR_BGR2GRAY)
-    frame_c_bw = cv2.cvtColor(crop_img_c, cv2.COLOR_BGR2GRAY)
+    frame_a_bw = cv2.cvtColor(frame_a, cv2.COLOR_BGR2GRAY)
+    frame_b_bw = cv2.cvtColor(frame_b, cv2.COLOR_BGR2GRAY)
+    frame_c_bw = cv2.cvtColor(frame_c, cv2.COLOR_BGR2GRAY)
     ssim_ab = ssim(frame_a_bw, frame_b_bw)
     ssim_bc = ssim(frame_b_bw, frame_c_bw)
     # now loop through all frames to look for "local minimums"
     for i in range(0, num-3):
         # read in four frames to opencv
         frame_d = cv2.imread(full_frame_path+'frame'+str(i+3)+'.jpg')
-        crop_img_d = frame_d[20:160, 50:270]
         # convert them to grayscale
-        frame_d_bw = cv2.cvtColor(crop_img_d, cv2.COLOR_BGR2GRAY)
+        frame_d_bw = cv2.cvtColor(frame_d, cv2.COLOR_BGR2GRAY)
         # calculate ssim between adjacent frames
         ssim_cd = ssim(frame_c_bw, frame_d_bw)
         # we have ssim_ab, ssim_bc, ssim_cd ... we want to know if ssim_bc is a "local minimum"
         # for now 0.6 is randomly chosen, seems to work OK
-        
-        #SOCCER
-        if ((ssim_bc/ssim_ab < 0.695 or ssim_bc/ssim_cd < .695) and i-last_frame > 20):
+        if (ssim_bc/ssim_ab < 0.6 and ssim_bc/ssim_cd < 0.6 and i-last_frame > 20):
             # print ('shot change frame '+ str(i+2))
-            #print("SHOT CHANGE HERE!")
             last_frame = i+2
             # build the shot_change array with the frame numbers where change happens
             shot_change.append(i+2)
-        #MERIDIAN
-        # if (ssim_bc/ssim_ab < 0.6 and ssim_bc/ssim_cd < .6 and i-last_frame > 20 and i < 13136):
-        #     # print ('shot change frame '+ str(i+2))
-        #     #print("SHOT CHANGE HERE!")
-        #     last_frame = i+2
-        #     # build the shot_change array with the frame numbers where change happens
-        #     shot_change.append(i+2)
-        # elif(ssim_bc/ssim_ab < 0.82 and ssim_bc/ssim_cd < .82 and i-last_frame > 20 and i >= 13136):
-        #     # print ('shot change frame '+ str(i+2))
-        #     #print("SHOT CHANGE HERE!")
-        #     last_frame = i+2
-        #     # build the shot_change array with the frame numbers where change happens
-        #     shot_change.append(i+2)
-        
         # slide the window
-        #doll scene change
-        if(i + 2 == 13450 or i + 2 == 13528):
-            print("i:", i)
-            print("ssim_ab:", ssim_ab)
-            print("ssim_bc!:", ssim_bc)
-            print("ssim_cd:", ssim_cd)
-        
         ssim_ab = ssim_bc
         ssim_bc = ssim_cd
         frame_c_bw = frame_d_bw
-        #print(i)
-    #add the last frame!
-    shot_change.append(len(files)-1)
     print('shot change array is:')
     print(shot_change)
     return shot_change
@@ -133,7 +101,7 @@ def FramesToVideo(summary_frame_path,pathOut,fps,frame_width,frame_height):
         img = cv2.imread(filename)
         # height, width, layers = img.shape
         # size = (width,height)
-        # print(filename)
+        print(filename)
         #inserting the frames into an image array
         frame_array.append(img)
     # define the parameters for creating the video
@@ -172,31 +140,21 @@ def main():
     full_frame_path = "../project_files/project_dataset/frames/meridian/"
 
     # directory for summary frames
-    summary_frame_path = "../project_files/summary/meridian/shot_frames/"
+    summary_frame_path = "../project_files/summary/meridian/frames/"
 
     # directory for summary video
-    summary_video_path = '../project_files/summary/meridian/shot_video/meridian.mp4'
-    
-    # empty the summary folders and summary results
-    print ('\nremoving previous files in summary folder and summary results')
-    filesToRemove = [os.path.join(summary_frame_path,f) for f in os.listdir(summary_frame_path)]
-    for f in filesToRemove:
-        os.remove(f)
-    if os.path.exists(summary_video_path):
-        os.remove(summary_video_path)
-    #if os.path.exists(collage_path):
-    #    os.remove(collage_path)
-    
+    summary_video_path = '../project_files/summary/meridian/video/meridian.mp4'
+
     # get shot_change array
-    shot_change = ShotChange(full_frame_path)
+    # shot_change = ShotChange(full_frame_path)
 
     # make summary frame folder
-    MakeSummaryFrames(full_frame_path,summary_frame_path,shot_change)
+    # MakeSummaryFrames(full_frame_path,summary_frame_path,shot_change)
 
     # make a video from the summary frame folder
-    FramesToVideo(summary_frame_path, summary_video_path, 30, 320, 180)
+    # FramesToVideo(summary_frame_path, summary_video_path, 30, 320, 180)
 
-    #FindFaces('/Users/gerrypesavento/Documents/sara/videosummary/project_files/project_dataset/frames/meridian/frame1089.jpg')
+    FindFaces('/Users/gerrypesavento/Documents/sara/videosummary/project_files/project_dataset/frames/meridian/frame1089.jpg')
 
 if __name__=="__main__":
     main()

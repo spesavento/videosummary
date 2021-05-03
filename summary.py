@@ -1,11 +1,11 @@
 #!/usr/bin/env python
 
-from skimage import data, img_as_float
-from skimage.metrics import structural_similarity as ssim
-from skimage import io
-from sklearn import preprocessing
+#from skimage import data, img_as_float
+#from skimage.metrics import structural_similarity as ssim
+#from skimage import io
+#from sklearn import preprocessing
 import numpy as np
-import cv2
+#import cv2
 import numpy as np
 import pickle as pl
 import struct
@@ -109,7 +109,7 @@ def FindFaces(framechange_array, frames_jpg_path):
             # convert to grayscale
             gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
             # detect faces
-            # scaleFactor – how much the image size is reduced at each image scale
+            # scaleFactor - how much the image size is reduced at each image scale
             # minNeighbors = 4 gives few false positives, but misses a few faces
             faces = face_classifier.detectMultiScale(gray, scaleFactor=1.1, minNeighbors=4)
             for (x, y, w, h) in faces:
