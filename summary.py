@@ -110,7 +110,7 @@ def FindFaces(framechange_array, frames_jpg_path):
     for x in range (0, len(framechange_array)-1):
         frames_in_shot = framechange_array[x+1] - framechange_array[x] - 1
         face_total = 0
-        for y in range (framechange_array[x], framechange_array[x+1]-1):
+        for y in range (framechange_array[x], framechange_array[x+1]-1, 5):
             # url of frame image to analyze
             filename=frames_jpg_path+'frame'+str(y)+'.jpg'
             # read it into OpenCV
@@ -139,7 +139,7 @@ def FindPeople(framechange_array, frames_jpg_path):
     for x in range (0, len(framechange_array)-1):
         frames_in_shot = framechange_array[x+1] - framechange_array[x] - 1
         people_total = 0
-        for y in range (framechange_array[x], framechange_array[x+1]-1):
+        for y in range (framechange_array[x], framechange_array[x+1]-1, 5):
             # url of frame image to analyze
             filename=frames_jpg_path+'frame'+str(y)+'.jpg'
             # read it into OpenCV
@@ -294,7 +294,7 @@ def MakeCollage(framechange_array, frames_jpg_path, collage_path):
 def main():
 
     # name of the video to process
-    video_name = 'soccer_2'
+    video_name = 'concert'
 
     # jpg video frames to be analyzed - ordered frame0.jpg, frame1.jpg, etc.
     frames_jpg_path = '../project_files/project_dataset/frames/'+video_name+'/'
