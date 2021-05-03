@@ -22,9 +22,11 @@ from skimage import data, img_as_float
 from skimage.metrics import structural_similarity as ssim
 from skimage import io
 from sklearn import preprocessing
+import videoplayer as vp
 
-is_cropped = 0 #1 is yes, use centering
-cutoff = 0.6 #ssim cutoff
+from pyAudioAnalysis import audioBasicIO
+from pyAudioAnalysis import ShortTermFeatures, MidTermFeatures
+import matplotlib.pyplot as plt
 
 def FrameSimilarity(frames_jpg_path):
     # calculates the "structured similarity index" between adjacent frames
@@ -42,19 +44,12 @@ def FrameSimilarity(frames_jpg_path):
         frame_a = cv2.imread(frames_jpg_path+'frame'+str(i)+'.jpg')
         frame_b = cv2.imread(frames_jpg_path+'frame'+str(i+1)+'.jpg')
         # crop frame images to center-weight them
-        if(is_cropped):
-            crop_img_a = frame_a[20:160, 50:270] #y1:y2 x1:x2 orginal is 320 w x 180 h
-            crop_img_b = frame_b[20:160, 50:270]
-        else:
-            crop_img_a = frame_a
-            crop_img_b = frame_b
+        crop_img_a = frame_a[20:160, 50:270] #y1:y2 x1:x2 orginal is 320 w x 180 h
+        crop_img_b = frame_b[20:160, 50:270]
         frame_a_bw = cv2.cvtColor(crop_img_a, cv2.COLOR_BGR2GRAY)
         frame_b_bw = cv2.cvtColor(crop_img_b, cv2.COLOR_BGR2GRAY)
         ssim_ab = ssim(frame_a_bw, frame_b_bw)
         ssim_ab = round(ssim_ab, 3)
-        # for debugging
-        # if (i > 6770 and i < 6890):
-        #     print ("frame ",str(i),", ssim "+str(ssim_ab))
         ssi_array.append(ssim_ab)
     return (ssi_array)
 
@@ -70,12 +65,13 @@ def FrameChange(ssi_array):
         ssim_bc = ssi_array[i+1]
         ssim_cd = ssi_array[i+2]
         # 0.6 is chosen because a 60% change in similarity works well for a shot change threshold
-        if (ssim_bc/ssim_ab < cutoff and ssim_bc/ssim_cd < cutoff and i-last_hit > 22):
+        if (ssim_bc/ssim_ab < 0.6 and ssim_bc/ssim_cd < 0.6 and i-last_hit > 22):
             framechange_array.append(i+2)
             last_hit = i+2
     # add the last frame to the array to the end if last frame is more than last shot change
     if num-1 > framechange_array[-1] + 4:
         framechange_array.append(num-1)
+
     return (framechange_array)
 
 def ShotArray(framechange_array):
@@ -164,15 +160,63 @@ def FindPeople(framechange_array, frames_jpg_path):
     people_array = [round(num, 3) for num in people_array_normalized]
     return(people_array)
 
-def TotalWeights(shot_array, action_array, face_array, people_array):
+def FindAudioShots(framechange_array, audio_path):
+    feature = 1
+    [Fs, x] = audioBasicIO.read_audio_file(audio_path)
+    x = audioBasicIO.stereo_to_mono(x)
+    frame_size = (Fs // 30)
+    F, f_names = ShortTermFeatures.feature_extraction(x, Fs, frame_size, frame_size, deltas=False)
+    # plt.subplot(2,1,1); plt.plot(F[3,:]); plt.xlabel('Frame no'); plt.ylabel(f_names[3]) 
+    # plt.subplot(2,1,2); plt.plot(F[feature,:]); plt.xlabel('Frame no'); plt.ylabel(f_names[feature]); plt.show()
+
+    astd = (np.std(F[feature,:]))
+    aave = (np.average(F[feature,:]))
+
+    which_shots = np.zeros(len(F[feature,:])).flatten()
+    print(which_shots.shape)
+
+    for i in range(len(F[feature,:])):
+        if (abs(F[feature,:][i]-aave) > astd * 4.5):
+            which_shots[i] = F[feature,:][i]
+    
+    audioshotchange_list = []
+
+    prev_val = 0.0
+    last_start = 0
+    for i in range(len(F[1,:])):
+        # print(which_shots[i])
+        if (prev_val == 0.0 and which_shots[i] > 0.0):
+            last_start = i
+        if (prev_val > 0.0 and which_shots[i] == 0.0):
+            audioshotchange_list.append([last_start, i, which_shots[last_start]])
+
+        prev_val = which_shots[i]
+    
+    audio_array = np.zeros(len(framechange_array)-1)
+
+    for x in range (0, len(framechange_array)-1):
+        first_frame = framechange_array[x]
+        last_frame = framechange_array[x+1]
+        for y in range(len(audioshotchange_list)):
+            if audioshotchange_list[y][0] >= first_frame and audioshotchange_list[y][0] < last_frame:
+                audio_array[x] += audioshotchange_list[y][2]
+        audio_array[x] /= (last_frame - first_frame)
+
+    audio_array = preprocessing.minmax_scale(audio_array, feature_range=(0, 1))
+    audio_array = [round(num, 3) for num in audio_array]
+    return(audio_array)
+
+def TotalWeights(shot_array, action_array, face_array, people_array, audio_array):
     # use numpy to add the weight arrays
     # for now a simple addition of action, face, people weights
     face_array_scaled = [element * 0.5 for element in face_array]
     people_array_scaled = [element * 0.5 for element in people_array]
+    audio_array_scaled = [element * 0.5 for element in audio_array]
     arr = []
     arr.append(action_array)
     arr.append(face_array_scaled)
     arr.append(people_array_scaled)
+    arr.append(audio_array_scaled)
     np_arr = np.array(arr)
     np_weight = np_arr.sum(axis=0)
     total_weight = list(np.around(np.array(np_weight),3))
@@ -221,7 +265,7 @@ def SaveSummaryFrames(totalweight_array, summary_frame_path, frames_jpg_path):
         for z in range (start, end):
             shot_image = frames_jpg_path+'frame'+str(z)+'.jpg'
             img = cv2.imread(shot_image)
-            summary_image = summary_frame_path+numlist[count]+'.jpg'
+            summary_image = summary_frame_path+str(z)+'.jpg'
             # add shot number to frame
             cv2.putText(
                 img, #numpy image
@@ -235,14 +279,32 @@ def SaveSummaryFrames(totalweight_array, summary_frame_path, frames_jpg_path):
             count = count+1
 
 # Convert frames folder to video using OpenCV
-def FramesToVideo(summary_frame_path,pathOut,fps,frame_width,frame_height):
+def FramesToVideo(summary_frame_path,pathOut,fps,frame_width,frame_height,audio_path,new_audio_path):
     frame_array = []
+    audio_frames = []
+
+    audio_object = wave.open(audio_path, 'r')
+    framerate = audio_object.getframerate()
+
     files = [f for f in os.listdir(summary_frame_path) if isfile(join(summary_frame_path,f))]
     # sort the files
     # see python reference https://docs.python.org/3/howto/sorting.html
     files.sort()
     for i in range(len(files)):
         filename=summary_frame_path+files[i]
+        FrameNum = int(os.path.splitext(files[i])[0])
+        # Convert to audio frame
+        # print(files[i])
+        # print(FrameNum)
+        AudioFrameNum = ((FrameNum * framerate) // 30)
+        # print(AudioFrameNum)
+        NumFramesToRead = (framerate // 30)
+        # print(NumFramesToRead)
+
+        audio_object.setpos(AudioFrameNum)
+        NewAudioFrames = audio_object.readframes(NumFramesToRead)
+        audio_frames.append(NewAudioFrames)
+
         #reading each files
         img = cv2.imread(filename)
         # height, width, layers = img.shape
@@ -258,6 +320,18 @@ def FramesToVideo(summary_frame_path,pathOut,fps,frame_width,frame_height):
         # writing to a image array
         out.write(frame_array[i])
     out.release()
+
+    # Write new audio file
+    sampleRate = framerate # hertz
+    duration = len(audio_frames) / framerate # seconds
+    obj = wave.open(new_audio_path,'w')
+    obj.setnchannels(2) # mono
+    obj.setsampwidth(2)
+    obj.setframerate(sampleRate)
+
+    for i in range(len(audio_frames)):
+        obj.writeframesraw(audio_frames[i])
+    obj.close()
 
 def MakeCollage(framechange_array, frames_jpg_path, collage_path):
     # creates a collage of the shots in a video, the collage shows shot # and frame #
@@ -297,18 +371,35 @@ def MakeCollage(framechange_array, frames_jpg_path, collage_path):
         im_v = cv2.vconcat([im_v, im_h])
     cv2.imwrite(collage_path, im_v)
 
+def SyncVideoWithAudio(old_video_name, video_name, audio_path):
+
+    my_clip = mpe.VideoFileClip(old_video_name)
+    audio_background = mpe.AudioFileClip(audio_path)
+    final_clip = my_clip.set_audio(audio_background)
+    final_clip.write_videofile(video_name,fps=30)
+
+    my_clip.close()
+    final_clip.close()
+    audio_background.close()
 
 def main():
 
     # name of the video to process
-    video_name = 'concert'
+    video_name = 'soccer'
 
     # jpg video frames to be analyzed - ordered frame0.jpg, frame1.jpg, etc.
     frames_jpg_path = '../project_files/project_dataset/frames/'+video_name+'/'
 
+    # audio to process
+    audio_path = '../project_files/project_dataset/audio/'+video_name+'.wav'
+
+    # new audio path
+    new_audio_path = "../project_files/summary/" +video_name+ "/sound.wav"
+
     # directory for summary frames and summary video
     summary_frame_path = '../project_files/summary/'+video_name+'/frames/'
     summary_video_path = '../project_files/summary/'+video_name+'/summary.mp4'
+    summary_video_audio_path = '../project_files/summary/'+video_name+'/summary_with_audio.mp4'
     collage_path = '../project_files/summary/'+video_name+'/collage.jpg'
 
     # empty the summary folders and summary results
@@ -339,6 +430,12 @@ def main():
     print (str(len(shot_array))+' shots in the video')
     print(str(shot_array))
 
+    # get the audio array
+    print('\naudio_array')
+    audio_array = FindAudioShots(framechange_array, audio_path)
+    print('there are '+str(len(audio_array))+' audio weights')
+    print(str(audio_array))
+
     # get action_array, shows the average action weight for each shot
     print ('\naction_array')
     action_array = FindAction(framechange_array, ssi_array)
@@ -360,7 +457,7 @@ def main():
     # total the weights
     print('\ntotalweight_array')
     print('[shot start, shot end, total weight]')
-    totalweight_array = TotalWeights(shot_array, action_array, face_array, people_array)
+    totalweight_array = TotalWeights(shot_array, action_array, face_array, people_array, audio_array)
     print(str(totalweight_array))
 
     # create summary frames in a folder
@@ -368,13 +465,17 @@ def main():
 
     # create summary video
     print('\nfrom the summary frames, creating a summary video')
-    FramesToVideo(summary_frame_path, summary_video_path, 30, 320, 180)
+    FramesToVideo(summary_frame_path, summary_video_path, 30, 320, 180, audio_path, new_audio_path)
     print('the summary video is stored as '+summary_video_path)
+
+    # Adding audio to video
+    SyncVideoWithAudio(summary_video_path, summary_video_audio_path, new_audio_path)
 
     # optional - make a photo collage of the shots
     print('\nbonus: photo collage of scenes saved as collage.jpg in the root folder')
-    MakeCollage(framechange_array, frames_jpg_path, collage_path)
+    # MakeCollage(framechange_array, frames_jpg_path, collage_path)
+
+    vp.PlayVideo(summary_video_audio_path)
 
 if __name__=="__main__":
     main()
-
