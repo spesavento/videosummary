@@ -60,7 +60,7 @@ def FrameChange(ssi_array):
         ssim_bc = ssi_array[i+1]
         ssim_cd = ssi_array[i+2]
         # 0.6 is chosen because a 60% change in similarity works well for a shot change threshold
-        if (ssim_bc/ssim_ab < 0.6 and ssim_bc/ssim_cd < 0.6 and i-last_hit > 25):
+        if (ssim_bc/ssim_ab < 0.6 and ssim_bc/ssim_cd < 0.6 and i-last_hit > 30):
             framechange_array.append(i+2)
             last_hit = i+2
     # add the last frame to the array to the end if last frame is more than last shot change
@@ -257,7 +257,8 @@ def MakeCollage(framechange_array, frames_jpg_path, collage_path):
     i = 0
     # start with a blank image that is the same width (2240px) of 7 frames
     im_v = cv2.imread('top.jpg')
-    for x in range (0, len(framechange_array)-5, 5):
+    # make a collage that is 7 frames wide
+    for x in range (0, len(framechange_array)-7, 7):
         im_a = cv2.imread(frames_jpg_path+'frame'+str(framechange_array[x]+offset)+'.jpg')
         im_b = cv2.imread(frames_jpg_path+'frame'+str(framechange_array[x+1]+offset)+'.jpg')
         im_c = cv2.imread(frames_jpg_path+'frame'+str(framechange_array[x+2]+offset)+'.jpg')
@@ -290,7 +291,7 @@ def MakeCollage(framechange_array, frames_jpg_path, collage_path):
 def main():
 
     # name of the video to process
-    video_name = 'meridian'
+    video_name = 'concert'
 
     # jpg video frames to be analyzed - ordered frame0.jpg, frame1.jpg, etc.
     frames_jpg_path = '../project_files/project_dataset/frames/'+video_name+'/'
