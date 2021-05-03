@@ -45,6 +45,9 @@ def FrameSimilarity(frames_jpg_path):
         frame_b_bw = cv2.cvtColor(crop_img_b, cv2.COLOR_BGR2GRAY)
         ssim_ab = ssim(frame_a_bw, frame_b_bw)
         ssim_ab = round(ssim_ab, 3)
+        # for debugging
+        # if (i > 6770 and i < 6890):
+        #     print ("frame ",str(i),", ssim "+str(ssim_ab))
         ssi_array.append(ssim_ab)
     return (ssi_array)
 
@@ -291,7 +294,7 @@ def MakeCollage(framechange_array, frames_jpg_path, collage_path):
 def main():
 
     # name of the video to process
-    video_name = 'superbowl_2'
+    video_name = 'soccer_2'
 
     # jpg video frames to be analyzed - ordered frame0.jpg, frame1.jpg, etc.
     frames_jpg_path = '../project_files/project_dataset/frames/'+video_name+'/'
