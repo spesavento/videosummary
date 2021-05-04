@@ -28,6 +28,9 @@ from pyAudioAnalysis import audioBasicIO
 from pyAudioAnalysis import ShortTermFeatures, MidTermFeatures
 import matplotlib.pyplot as plt
 
+from moviepy.editor import *
+import pygame
+
 def FrameSimilarity(frames_jpg_path):
     # calculates the "structured similarity index" between adjacent frames
     # ssim() looks at luminance, contrast and structure, it is a scikit-image function
@@ -471,8 +474,8 @@ def main():
     # Adding audio to video
     SyncVideoWithAudio(summary_video_path, summary_video_audio_path, new_audio_path)
 
-    # optional - make a photo collage of the shots
-    print('\nbonus: photo collage of scenes saved as collage.jpg in the root folder')
+    # # optional - make a photo collage of the shots
+    # print('\nbonus: photo collage of scenes saved as collage.jpg in the root folder')
     # MakeCollage(framechange_array, frames_jpg_path, collage_path)
 
     vp.PlayVideo(summary_video_audio_path)
