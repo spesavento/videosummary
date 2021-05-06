@@ -168,3 +168,4 @@ def main(anchorFrame, targetFrame, outfile="OUTPUT", saveOutput=False, blockSize
     residualMetric = getResidualMetric(residualFrame)
 
     return residualMetric
+
