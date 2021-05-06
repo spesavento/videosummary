@@ -1,5 +1,3 @@
-# Code to Perform Block Matching
-
 import numpy as np
 import cv2
 import random
@@ -143,8 +141,8 @@ def getResidualMetric(residualFrame):
 def preprocess(anchor, target, blockSize):
 
     if isinstance(anchor, str) and isinstance(target, str):
-        anchorFrame = ((cv2.cvtColor(cv2.imread(anchor), cv2.COLOR_BGR2YCrCb))[40:120, 80:240])[:, :, 0] # get luma component
-        targetFrame = ((cv2.cvtColor(cv2.imread(target), cv2.COLOR_BGR2YCrCb))[40:120, 80:240])[:, :, 0] # get luma component
+        anchorFrame = ((cv2.cvtColor(cv2.imread(anchor), cv2.COLOR_BGR2YCrCb)))[:, :, 0] # get luma component
+        targetFrame = ((cv2.cvtColor(cv2.imread(target), cv2.COLOR_BGR2YCrCb)))[:, :, 0] # get luma component
 
     elif isinstance(anchor, np.ndarray) and isinstance(target, np.ndarray):
         anchorFrame = BGR2YCrCb(anchor)[:, :, 0] # get luma component
